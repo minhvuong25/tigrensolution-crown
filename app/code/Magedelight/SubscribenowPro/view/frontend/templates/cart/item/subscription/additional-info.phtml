@@ -1,0 +1,28 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php if ($block->hasAdditionalInfo()) : ?>
+    <table class="data table table-order-items recent">
+        <tbody>
+        <?php foreach ($block->getAdditionalInfo() as $label => $value) :?>
+            <tr class="first odd">
+                <th class="label"><?= /* @escapeNotVerified */ $label ?> </th>
+                <td class="data last"><?= /* @escapeNotVerified */ $value ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endif; ?>

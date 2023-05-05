@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="tigren" translate="label" sortOrder="1000">
+            <label>Tigren</label>
+        </tab>
+        <section id="tigren_support_email" translate="label" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Support Emails</label>
+            <tab>tigren</tab>
+            <resource>Tigren_SupportEmails::config</resource>
+            <group id="support_email" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Cron Mailing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    <comment>Choose the store email sender.</comment>
+                </field>
+                <field id="template_upcoming" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template Upcoming</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="template_past" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template Past</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="coupon_code" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shopping Cart Price Rule</label>
+                    <comment>Select Shopping Cart Price Rule ID which will be used</comment>
+                    <source_model>Tigren\SupportEmails\Model\Config\CouponCode</source_model>
+                </field>
+                <field id="product_option" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Product Option</label>
+                    <comment>Write a custom option name whose products will support the mailing. (Title near to price field)</comment>
+                </field>
+            </group>
+            <group id="send_email" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Test Email</label>
+                <field id="order_id" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order ID</label>
+                    <validate>validate-number</validate>
+                    <comment>Enter an order id and save config. Than you will be able to send test emails</comment>
+                </field>
+                <field id="send_button" translate="label" type="button" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Upcoming End of Support</label>
+                    <frontend_model>Tigren\SupportEmails\Block\System\Config\SendEmailUpcoming</frontend_model>
+                </field>
+                <field id="send_button_past" translate="label" type="button" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Past Support</label>
+                    <frontend_model>Tigren\SupportEmails\Block\System\Config\SendEmailPast</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

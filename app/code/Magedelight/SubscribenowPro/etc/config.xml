@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+     <default>
+        <md_subscribenow>
+            <pro>
+                <default_chart>renderGoogleColumnChart</default_chart>
+                <default_period>last_7_days</default_period>
+                <is_chart_multicolor>0</is_chart_multicolor>
+                <default_chart_color>#3366cc</default_chart_color>
+                <chart_to_table>1</chart_to_table>
+            </pro>
+            <merge_order>
+                <enable>1</enable>
+                <validate_qty>0</validate_qty>
+                <fail_order_if_fail_addtocart>0</fail_order_if_fail_addtocart>
+            </merge_order>
+        </md_subscribenow>
+    </default>
+</config>

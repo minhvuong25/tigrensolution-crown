@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<system>
+    <tab id="tigrennumber" translate="label" sortOrder="1000">
+        <label>Tigren</label>
+    </tab>
+    <section id="tigren_number" translate="label" type="text" sortOrder="1998" showInDefault="1" showInWebsite="1" showInStore="1">
+        <class>separator-top</class>
+        <label>Order Number</label>
+        <tab>tigren</tab>
+        <resource>Tigren_Number::number</resource>
+        <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Settings</label>
+            <field id="invoiceprefix" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Invoice Prefix</label>
+            </field>
+            <field id="shipmentprefix" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipment Prefix</label>
+            </field>
+        </group>
+    </section>
+</system>
+</config>

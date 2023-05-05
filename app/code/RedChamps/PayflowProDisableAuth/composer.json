@@ -1,0 +1,13 @@
+{
+    "name": "redchamps/module-payflow-pro-disable-auth",
+    "description": "This extension adds modification to Magento's Paypal module specifically replaces auth transaction in Payflow pro with a 0 amount sales transaction.",
+    "require": {
+        "magento/module-paypal": "*"
+    },
+    "autoload": {
+        "psr-4": { "RedChamps\\PayflowProDisableAuth\\": "" },
+        "files": [ "registration.php" ]
+    },
+    "type": "magento2-module",
+    "version": "1.0.0"
+}

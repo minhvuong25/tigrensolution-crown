@@ -1,0 +1,29 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php if ($block->hasAdditionalInfo()) : ?>
+    <?php foreach ($block->getAdditionalInfo() as $label => $value) : ?>
+        <div class="admin__field md_subscription_content" style="<?= /* @escapeNotVerified */ ($block->canDisplayContent())?'':'display: none;' ?>">
+            <label class="label admin__field-label">
+                <span><?= /* @escapeNotVerified */ $label ?></span>
+            </label>
+            <div class="admin__field-control">
+                <div class="admin__field admin__field-option">
+                    <label class="admin__field-label"><?= /* @escapeNotVerified */ $value ?></label>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>

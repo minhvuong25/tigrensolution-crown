@@ -1,0 +1,122 @@
+<?php
+/** @var $helper \Tigren\Callback\Helper\Config */
+?>
+<?php
+$helper = $this->helper('Tigren\Callback\Helper\Config');
+$baseUrl = $helper->getBaseUrl();
+$html = $helper->getHelpLinks();
+?>
+<?php if (!empty($html)): ?>
+    <?php foreach ($html as $helpLink): ?>
+        <?php if (!empty($helpLink)): ?>
+            <div class="help-block-content">
+                <div class="help-title">
+                    <span class="h2"><?= /* @escapeNotVerified */
+                        __('Need Help?') ?>
+                    </span>
+                </div>
+                <div class="help-links">
+                    <?= $helpLink ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
+<div id="callback-modal" style=" display: none">
+    <form class="form-callback" action="<?php echo $block->getFormAction(); ?>" id="callback-form" method="post"
+          enctype="multipart/form-data" autocomplete="off" data-hasrequired="* Required Fields"
+          data-mage-init='{"validation":{}}'>
+        <h3 class="popup-title"><?= $block->escapeHtml(__('Talk By Phone')) ?></h3>
+        <p class="popup-response-messages" style="display: none">
+            <span class="h3"><?= $block->escapeHtml(__('Thank You')) ?></span><br>
+            <span><?= $block->escapeHtml(__('One of our product specialists will contact you as soon as possible.')) ?></span>
+        </p>
+        <fieldset class="fieldset callback-field">
+            <p class="popup-description">
+                <?= $block->escapeHtml(__('Have a question? Allow one of our product specialists to call you back and help you!')) ?><br>
+                <?= $block->escapeHtml(__('(Mon - Fri: 8am - 9pm EST)')) ?>
+            </p>
+            <div class="field name required">
+                <label class="label"
+                       for="name"><span><?= $block->escapeHtml(__('You Name')) ?></span></label>
+                <div class="control">
+                    <input name="name" id="name" title="<?= $block->escapeHtmlAttr(__('You Name')) ?>"
+                           class="input-text" type="text" data-validate="{required:true}"/>
+                </div>
+            </div>
+            <div class="field phone required">
+                <label class="label"
+                       for="phone"><span><?= $block->escapeHtml(__('Phone Number')) ?></span></label>
+                <div class="control">
+                    <input name="phone" id="phone" title="<?= $block->escapeHtmlAttr(__('Phone Number')) ?>"
+                           class="input-text" type="tel"
+                           data-validate="{required:true,'validate-phoneStrict':true}"/>
+                </div>
+            </div>
+        </fieldset>
+        <div class="actions-toolbar callback-now">
+            <div class="primary">
+                <input type="hidden" name="hideit" id="hideit" value=""/>
+                <button type="send" id="send" title="<?= $block->escapeHtmlAttr(__('Call Me Now')) ?>"
+                        class="action submit primary">
+                    <span><?= $block->escapeHtml(__('Call Me Now')) ?></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function ($,
+                  modal) {
+            var options = {
+                type: 'popup',
+                modalClass: 'callback-modalpopup',
+                responsive: true,
+                innerScroll: true,
+                buttons: false
+            };
+
+            var popup = modal(options, $('#callback-modal'));
+            $(".callback").on('click', function () {
+                $("#name").val('');
+                $("#phone").val('');
+                $("#callback-modal").modal("openModal");
+
+            });
+
+            $("#send").on('click', function (e) {
+                e.preventDefault();
+                var name = jQuery("#name").val();
+                var phone = jQuery("#phone").val();
+                if ($("#callback-form").validation('isValid')) {
+                    jQuery.ajax({
+                        url: "<?php echo $baseUrl . 'callback/request/send'; ?>",
+                        type: 'POST',
+                        showLoader: true,
+                        data: {
+                            name: name,
+                            phone: phone
+                        },
+                    }).done(successRequest).fail(errorResponse);
+                }
+
+                function successRequest(response) {
+                    $('.callback-field').css({display: 'none'}),
+                        $('.callback-now').css({display: 'none'}),
+                        $('.popup-response-messages').css({display: 'block'});
+                }
+
+                function errorResponse(response) {
+                    $('.popup-response-messages').html(response.responseJSON);
+                }
+            });
+        }
+    );
+</script>
+

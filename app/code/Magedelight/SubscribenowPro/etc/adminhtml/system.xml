@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */ 
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="md_subscribenow">
+            <group id="pro" translate="label" type="text" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="500">
+                <label>Pro Settings</label>
+
+                <field id="default_chart" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="10">
+                    <label>Default Chart</label>
+                    <source_model>Magedelight\SubscribenowPro\Model\Config\Source\Charts</source_model>
+                </field>
+
+                <field id="default_period" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="20">
+                    <label>Default Chart Period</label>
+                    <source_model>Magedelight\SubscribenowPro\Model\Config\Source\ChartPeriod</source_model>
+                </field>
+
+                <field id="is_chart_multicolor" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="40">
+                    <label>Is Chart Multi Color</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Do you want to render chart with multiple colors ?</comment>
+                </field>
+
+                <field id="default_chart_color" translate="label" type="md_colorpicker" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="50">
+                    <label>Default Chart Color</label>
+                    <depends>
+                        <field id="is_chart_multicolor">0</field>
+                    </depends>
+                </field>
+
+                <field id="chart_to_table" translate="label" type="select" showInDefault="0" showInWebsite="0" showInStore="0" sortOrder="60">
+                    <label>Convert Graph Data To Table Format</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>This will Add a Table to Represent Graph Data in HTML Readable Format</comment>
+                </field>
+            </group>
+            <group id="merge_order" translate="label" type="text" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="200">
+                <label>Merge Order Settings</label>
+                <field id="enable" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="10">
+                    <label>Enable Merge Order</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="validate_qty" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="20">
+                    <label>Validate Qty</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Validate Product Qty When Combining multiple profiles into single order ?</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="fail_order_if_fail_addtocart" translate="label" type="select" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="30">
+                    <label>Fail Order if Fail Addtocart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When adding product to cart from Multiple Subscription, if any subscription item is failed to add to cart for any reason like out of stock or something, Should system fail all the subscriptions or it should fail only that specific subscription and go ahead with other subscription</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

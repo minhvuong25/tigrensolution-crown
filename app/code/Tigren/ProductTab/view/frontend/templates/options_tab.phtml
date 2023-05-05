@@ -1,0 +1,20 @@
+<?php
+/**
+ * *
+ * * @author    Tigren Solutions <info@tigren.com>
+ * * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+ * * @license   Open Software License ("OSL") v. 1.0.0
+ *
+ */
+?>
+<?php
+/** @var  $block \Tigren\ProductTab\Block\Tabs\Option */
+/** @var  $helper \Tigren\NeedHelp\Helper\Data */
+
+$product = $block->getProduct();
+$options = $product->getData('product_options');
+
+?>
+<div class="custom-options-content">
+<?= $options ?>
+</div>

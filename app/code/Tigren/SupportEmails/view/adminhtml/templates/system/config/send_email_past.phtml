@@ -1,0 +1,37 @@
+<?php /* @var $block \Tigren\SupportEmails\Block\System\Config\Send */ ?>
+<?= $block->getButtonHtml() ?>
+
+<script>
+    require([
+        'jquery',
+        'prototype',
+        'Magento_Ui/js/modal/alert'
+    ], function(jQuery, alert){
+        function syncronize() {
+            params = {
+            };
+
+            new Ajax.Request('<?= $block->getAdminUrl() ?>', {
+                showLoader:     true,
+                asynchronous:   true,
+                parameters:     params,
+            }).done(successRequest).fail(errorResponse);
+
+            function successRequest(response) {
+                alert({
+                    title: 'Success',
+                });
+            }
+
+            function errorResponse(response) {
+                alert({
+                    title: 'Error',
+                });
+            }
+        }
+
+        jQuery('#send_button_past').click(function () {
+            syncronize();
+        });
+    });
+</script>

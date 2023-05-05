@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * FME Extensions
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the fmeextensions.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.fmeextensions.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category  FME
+ * @author     Atta <support@fmeextensions.com>
+ * @package   FME_Productvideos
+ * @copyright Copyright (c) 2019 FME (http://fmeextensions.com/)
+ * @license   https://fmeextensions.com/LICENSE.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <productvideos>
+            <general>
+                <enable_module>1</enable_module>
+                <title>Product Videos</title>
+            </general>
+            <compactview>
+                <view>rwt</view>
+            </compactview>
+            <slideoptions>
+                <slider_transition>fade</slider_transition>
+                <slider_transition_speed>1000</slider_transition_speed>
+                <slider_control_swipe>1</slider_control_swipe>
+                <slider_enable_bullets1>1</slider_enable_bullets1>
+                <slider_bullets_align_hor>center</slider_bullets_align_hor>
+                <slider_bullets_align_vert>top</slider_bullets_align_vert>
+                <slider_enable_arrows>1</slider_enable_arrows>
+                <slider_enable_progress_indicator>1</slider_enable_progress_indicator>
+                <slider_progress_indicator_type>pie2</slider_progress_indicator_type>
+                <slider_progress_indicator_align_vert>middle</slider_progress_indicator_align_vert>
+                <slider_progressbar_color>#0e8f28</slider_progressbar_color>
+                <slider_progressbar_opacity>0.4</slider_progressbar_opacity>
+                <slider_progressbar_line_width>5</slider_progressbar_line_width>
+                <slider_progresspie_type_fill>1</slider_progresspie_type_fill>
+                <slider_progresspie_color1>#d62000</slider_progresspie_color1>
+                <slider_progresspie_color2>#0e5912</slider_progresspie_color2>
+                <slider_progresspie_stroke_width>1000</slider_progresspie_stroke_width>
+                <slider_progresspie_width>50</slider_progresspie_width>
+                <slider_progresspie_height>50</slider_progresspie_height>
+                <slider_enable_play_button>1</slider_enable_play_button>
+                <slider_play_button_align_hor>left</slider_play_button_align_hor>
+                <slider_play_button_align_vert>top</slider_play_button_align_vert>
+                <slider_enable_fullscreen_button>1</slider_enable_fullscreen_button>
+                <slider_fullscreen_button_align_hor>left</slider_fullscreen_button_align_hor>
+                <slider_fullscreen_button_align_vert>top</slider_fullscreen_button_align_vert>
+                <slider_controls_always_on>0</slider_controls_always_on>
+                <slider_controls_appear_duration>1000</slider_controls_appear_duration>
+                <slider_enable_text_panel>0</slider_enable_text_panel>
+                <slider_textpanel_bg_color>#66082e</slider_textpanel_bg_color>
+                <slider_textpanel_bg_opacity>0.4</slider_textpanel_bg_opacity>
+            </slideoptions>
+             <nanogalllerySetting>
+                <enable_module>thumb</enable_module>
+                <inbulitlayouts>cl</inbulitlayouts>
+                <gallerylayout>
+                    <layouts>mosaic</layouts>
+                    <width>300</width>
+                    <height>300</height>
+                    <justheight>400</justheight>
+                    <cascadingwidth>400</cascadingwidth>
+                    <mosaicwidth>300</mosaicwidth>
+                    <mosaicheight>300</mosaicheight>
+                    <mosaictextarea>[ { "c": 1, "r": 1, "w": 2, "h": 2 }, 
+                    { "c": 3, "r": 1, "w": 1, "h": 1 }, 
+                    { "c": 3, "r": 2, "w": 1, "h": 1 },
+                    { "c": 4, "r": 1, "w": 1, "h": 1 },
+                    { "c": 4, "r": 2, "w": 1, "h": 1 },
+                    { "c": 5, "r": 1, "w": 2, "h": 2 }
+                    ]
+                    </mosaictextarea>
+                    <thumbnailBorderHorizontal>2</thumbnailBorderHorizontal>
+                    <thumbnailBorderVertical>2</thumbnailBorderVertical>
+                    <bg_color>#00022e</bg_color>
+                    <thumbnailGutterWidth>0</thumbnailGutterWidth>
+                    <thumbnailGutterHeight>0</thumbnailGutterHeight>
+                    <thumnsallign>right</thumnsallign>
+                    <thumbnailDisplayInterval>500</thumbnailDisplayInterval>
+                    <thumbnailDisplayTransition>slideRight</thumbnailDisplayTransition>
+                    <thumbnailDisplayTransitionDuration>1000</thumbnailDisplayTransitionDuration>
+                </gallerylayout>
+                <paginitionsettings>
+                    <paginitionType>pbtoon</paginitionType>
+                    <galleryLastRowFull>1</galleryLastRowFull>
+                    <allowgalleryMaxRows>1</allowgalleryMaxRows>
+                    <galleryMaxRows>1</galleryMaxRows>
+                    <galleryDisplayMoreStep>3</galleryDisplayMoreStep>
+                    <dotgalleryMaxRows>3</dotgalleryMaxRows>
+                    <numgalleryMaxRows>3</numgalleryMaxRows>
+                    <rectgalleryMaxRows>3</rectgalleryMaxRows>
+                </paginitionsettings>
+                <labelSetting>
+                    <position>overImageOnMiddle</position>
+                    <align>right</align>
+                    <display>1</display>
+                </labelSetting>
+                <thumbnailtools>
+                    <topLeft>download,cart</topLeft>
+                    <topRight></topRight>
+                    <bottomLeft></bottomLeft>
+                    <bottomRight></bottomRight>
+                </thumbnailtools>
+                <hovereffect>
+                    <thumbnailHoverEffect2>'thumbnail_translateZ_0px_100px_easeOutQuad_400 | thumbnail_rotateX_0deg_10deg_easeOutBack_200 | thumbnail_rotateX_10deg_0deg_delay250_keyframe_hoverin_easeOutBack_400'</thumbnailHoverEffect2>
+                </hovereffect>
+                <lightBox>
+                    <topLeft>label</topLeft>
+                    <topRight>playPauseButton, zoomButton, fullscreenButton, closeButton</topRight>
+                    <viewerToolbarstandard>minimizeButton, label, shareButton, fullscreenButton</viewerToolbarstandard>
+                    <viewerToolbarminimize>minimizeButton, label, fullscreenButton, downloadButton, infoButton</viewerToolbarminimize>
+                </lightBox>
+            </nanogalllerySetting>
+        </productvideos>
+       
+    </default>
+</config>

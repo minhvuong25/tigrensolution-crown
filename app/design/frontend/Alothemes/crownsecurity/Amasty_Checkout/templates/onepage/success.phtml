@@ -1,0 +1,58 @@
+<?php
+/**
+ * @author    Tigren Solutions <info@tigren.com>
+ * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+?>
+<?php /** @var $block \Magento\Checkout\Block\Onepage\Success */ ?>
+<div class="checkout-success">
+    <h1 class="page-title">
+            <span><?= $block->escapeHtml(__('Your order has been successfully placed.')) ?></span>
+        </h1>
+    <?php if ($block->getOrderId()) :?>
+        <div class="success-messages">
+            <p><?= $block->escapeHtml(__('Thank you for your order!')) ?></p>
+            <?php if ($block->getCanViewOrder()) :?>
+                <p><?= $block->escapeHtml(__('Your order number is:')) ?>
+                    <a href="<?= /* @noEscape */$block->getViewOrderUrl() ?>"
+                       class="order-number">
+                        <strong>
+                            <?= /* @noEscape */$block->getOrderId() ?>.
+                        </strong>
+                    </a>
+                </p>
+            <?php  else : ?>
+                <p>
+                    <?= $block->escapeHtml(__('Your order number is:')) ?>
+                    <span>
+                        <?= /* @noEscape */$block->getOrderId() ?>.
+                    </span>
+                </p>
+            <?php endif;?>
+            <div class="text">
+                <p><?= $block->escapeHtml(__('Once your package ships we will send an email with your tracking number.')) ?></p>
+                <p><?= $block->escapeHtml(__('If you have any questions about your order please contact us at ')) ?>
+                    <a href="mailto:sales@crownsecurityproducts.com">sales@crownsecurityproducts.com</a>
+                    <?=  /* @escapeNotVerified */__(' or call at ') ?>
+                    <a href="tel:800.914.9191" class="tel"><strong>800.914.9191</strong></a>
+                    <?=  /* @escapeNotVerified */__(', Mon - Fri, 8am - 9pm EST.') ?>
+                </p>
+                <p><?= $block->escapeHtml(__('Your order confirmation is below. Thank you again for your business.')) ?></p>
+            </div>
+        </div>
+        <?= $block->getChildHtml('details') ?>
+    <?php endif;?>
+
+    <?= $block->getAdditionalInfoHtml() ?>
+    <?= $block->getChildHtml('cms') ?>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <a class="action primary continue" href="<?= /* @noEscape */$block->getUrl() ?>">
+                <span><?= $block->escapeHtml(__('Continue Shopping')) ?></span>
+            </a>
+        </div>
+        <?= $block->getChildHtml('checkout.success.printorder') ?>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+{
+    "name": "magedelight/module-subscribenowhidetc",
+    "description": "Magedelight subscribe now hide Terms and Condition on subscribe now products",
+    "type": "magento2-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Magedelight",
+            "email": "info@magedelight.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magedelight\\SubscribeNowHideTC\\": ""
+        }
+    }
+}

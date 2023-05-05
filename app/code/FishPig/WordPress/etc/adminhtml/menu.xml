@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="FishPig_WordPress::config_wordpress"
+             title="WordPress"
+             module="FishPig_WordPress"
+             sortOrder="30"
+             resource="FishPig_WordPress::config_wordpress"
+        />
+        <add id="FishPig_WordPress::wordpress"
+             title="Configuration"
+             module="FishPig_WordPress"
+             sortOrder="20"
+             parent="FishPig_WordPress::config_wordpress"
+             action="adminhtml/system_config/edit/section/wordpress"
+             resource="FishPig_WordPress::wordpress"
+        />
+        <add id="FishPig_WordPress::wordpress_admin"
+             title="WordPress Admin"
+             module="FishPig_WordPress"
+             sortOrder="10"
+             parent="FishPig_WordPress::config_wordpress"
+             action="tigren/custom_url"
+             resource="FishPig_WordPress::wordpress_admin"
+        />
+    </menu>
+</config>

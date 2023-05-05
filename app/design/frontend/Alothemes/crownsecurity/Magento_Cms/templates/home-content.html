@@ -1,0 +1,107 @@
+{{widget type="Nwdthemes\Revslider\Block\Widget\Revslider" alias="slider-1"}}
+<div class="cms-static-policy policy">
+    <div class="container">
+        <div class="policy-wrap clearfix">
+            <div class="policy-box">
+                <div class="box-content">
+                    <div class="icon-service">
+                        <img alt="icon 1" src="{{view url="images/icon-1.svg"}}">
+                    </div>
+                    <div class="service-content">
+                        <div class="info-title">
+                            <h3>No Sales Tax</h3>
+                        </div>
+                        <div class="sub-title">Except Orders Shipping to FL</div>
+                    </div>
+                </div>
+            </div>
+            <div class="policy-box">
+                <div class="box-content">
+                    <div class="icon-service">
+                        <img  alt="icon 2" src="{{view url="images/icon-2.svg"}}">
+                    </div>
+                    <div class="service-content">
+                        <div class="info-title">
+                            <h3>Same Day Shipping</h3>
+                        </div>
+                        <div class="sub-title">Orders Placed by 3pm EST</div>
+                    </div>
+                </div>
+            </div>
+            <div class="policy-box">
+                <div class="box-content">
+                    <div class="icon-service">
+                        <img  alt="icon 3" src="{{view url="images/icon-3.svg"}}">
+                    </div>
+                    <div class="service-content">
+                        <div class="info-title">
+                            <h3><span>Guaranteed</span> Low Prices</h3>
+                        </div>
+                        <div class="sub-title">Trust Our 20% Guarantee</div>
+                    </div>
+                </div>
+            </div>
+            <div class="policy-box">
+                <div class="box-content">
+                    <div class="icon-service">
+                        <img alt="icon 4" src="{{view url="images/icon-4.svg"}}">
+                    </div>
+                    <div class="service-content">
+                        <div class="info-title">
+                            <h3>Safe & Secure</h3>
+                        </div>
+                        <div class="sub-title">256-bit Encryption</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- magicproduct -->
+<div class="box-products box-products-one">
+    <div class="container">
+        {{widget type="Magiccart\Magicproduct\Block\Widget\Product" identifier="feature-products" template="product.phtml"}}
+    </div>
+</div>
+<!--testimonial-->
+<div class="testimonials-section">
+    <div class="container">
+        {{widget type="Magiccart\Testimonial\Block\Widget\Testimonial" template="testimonial.phtml"}}
+    </div>
+</div>
+<!-- megashop product-->
+<div class="box-products box-products-two">
+    <div class="container">
+        <div class="row">
+            <ul class="block-title-tabs">
+                <li class="highlighted-title current" data-tab="tab-1">Latest</li>
+                <li class="highlighted-title" data-tab="tab-2">Sale</li>
+                <li class="highlighted-title" data-tab="tab-3">Trending</li>
+            </ul>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 custom-product custom tab-content current" id="tab-1">
+                {{widget type="Magento\CatalogWidget\Block\Product\ProductsList" title="Latest" show_pager="0" products_count="10" template="Magento_CatalogWidget::product/widget/content/grid.phtml" conditions_encoded="^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`sku`,`operator`:`()`,`value`:`TAS-CR380, GP-T7460-CP`^]^]"}}
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 custom-product custom tab-content" id="tab-2">
+                {{widget type="Magento\CatalogWidget\Block\Product\ProductsList" title="Sale" show_pager="0" products_count="2" template="Magento_CatalogWidget::product/widget/content/grid.phtml" conditions_encoded="^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`sku`,`operator`:`()`,`value`:`ID-E-01, TAS-CRC2PRO`^]^]"}}
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 custom-product custom tab-content" id="tab-3">
+                {{widget type="Magento\CatalogWidget\Block\Product\ProductsList" title="Trending" show_pager="0" products_count="2" template="Magento_CatalogWidget::product/widget/content/grid.phtml" conditions_encoded="^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`sku`,`operator`:`()`,`value`:`TAS-FACEPRO, AC-EM130`^]^]"}}
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery'
+    ], function($){
+        (function($) {
+            $('ul.block-title-tabs li').click(function() {
+                var tab_id = $(this).attr('data-tab');
+                $('ul.block-title-tabs li').removeClass('current');
+                $('.tab-content').removeClass('current');
+                $(this).addClass('current');
+                $("#" + tab_id).addClass('current');
+            })
+        })(jQuery);
+    });
+</script>

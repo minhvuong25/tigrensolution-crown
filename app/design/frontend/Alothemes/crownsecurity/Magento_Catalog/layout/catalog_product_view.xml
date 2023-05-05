@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <body>
+		<referenceContainer name="product.info.media">
+			<block class="FME\Productvideos\Block\Productvideos" name="video.block" template="Magento_Catalog::product/video-block.phtml" after="product.info.media.image"/>
+			<block class="Magento\Framework\View\Element\Template" name="help.block" template="Magento_Catalog::product/help-block.phtml" after="video.block"/>
+		</referenceContainer>
+        <referenceBlock name="product.info.sku" remove="true" />
+        <referenceContainer name="product.info.social" remove="true" />
+        <referenceBlock name="product.info.overview">
+            <arguments>
+                <argument name="at_call" xsi:type="string">getShortDescription</argument>
+                <argument name="at_code" xsi:type="string">short_description</argument>
+                <argument name="css_class" xsi:type="string">overview</argument>
+                <argument name="at_label" translate="true" xsi:type="string">title</argument>
+                <argument name="title" translate="true" xsi:type="string">Quick Overview</argument>
+                <argument name="add_attribute" xsi:type="string">itemprop="description"</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="product.social.share" remove="true" />
+        <referenceContainer name="product.info.media" htmlClass="product media product-img-box clearfix col-md-4 col-sm-7 col-xs-12" />
+        <referenceContainer name="product.content.left" htmlClass="shop-content-left hidden-sm hidden-xs" />
+        <referenceContainer name="product.info.main" htmlClass="product-info-main product-shop col-md-8 col-sm-5 col-xs-12" />
+        <referenceContainer name="product.detail">
+            <container name="product.shop.mobile" label="Product info Mobile" htmlTag="div" htmlClass="product-shop-mobile col-sm-12 col-xs-12 visible-sm visible-xs" after="-">
+                <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.overview.mobile" template="product/view/attribute.phtml" group="detailed_info" after="product.info.review">
+                    <arguments>
+                        <argument name="at_call" xsi:type="string">getShortDescription</argument>
+                        <argument name="at_code" xsi:type="string">short_description</argument>
+                        <argument name="css_class" xsi:type="string">overview</argument>
+                        <argument name="at_label" translate="true" xsi:type="string">title</argument>
+                        <argument name="title" translate="true" xsi:type="string">Quick Overview</argument>
+                        <argument name="add_attribute" xsi:type="string">itemprop="description"</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.bullets.mobile" template="product/view/attribute.phtml" before="-" after="product.info.overview.mobile">
+                    <arguments>
+                        <argument name="at_call" xsi:type="string">getProductBullets</argument>
+                        <argument name="at_code" xsi:type="string">product_bullets</argument>
+                        <argument name="css_class" xsi:type="string">product_bullets</argument>
+                        <argument name="at_label" xsi:type="string">none</argument>
+                        <argument name="add_attribute" xsi:type="string">itemprop="product_bullets"</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View\Description" name="product.learn.link.mobile" template="product/view/learn_link.phtml" before="-" after="product.info.bullets.mobile">
+                    <arguments>
+                        <argument name="at_call" xsi:type="string">getLearnLink</argument>
+                        <argument name="at_code" xsi:type="string">learn_link</argument>
+                        <argument name="css_class" xsi:type="string">learn_link</argument>
+                        <argument name="at_label" xsi:type="string">none</argument>
+                        <argument name="add_attribute" xsi:type="string">itemprop="learn_link"</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceContainer>
+        <referenceContainer name="product.info.media">
+            <container name="product.info.title.m" label="Product info auxiliary container" htmlTag="div" htmlClass="product-info-title product-shop-caption visible-sm visible-xs" before="-">
+                <block class="Magento\Theme\Block\Html\Title" name="page.main.title.m" template="html/title.phtml"/>
+                <container name="product.iunfo.stock.sku.m" label="Product auxiliary info" htmlTag="div" htmlClass="product-info-stock-sku">
+                    <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.sku.m" template="product/view/attribute.phtml" after="product.info.type">
+                        <arguments>
+                            <argument name="at_call" xsi:type="string">getSku</argument>
+                            <argument name="at_code" xsi:type="string">sku</argument>
+                            <argument name="css_class" xsi:type="string">sku</argument>
+                            <argument name="at_label" xsi:type="string">default</argument>
+                            <argument name="add_attribute" xsi:type="string">itemprop="sku"</argument>
+                        </arguments>
+                    </block>
+                </container>
+                <block class="Magento\Catalog\Block\Product\View" name="product.info.review.m" template="product/view/review.phtml" after="page.main.title" />
+            </container>
+        </referenceContainer>
+        <referenceContainer name="product.info.title">
+            <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.bullets" template="product/view/attribute.phtml" before="-" after="product.info.overview">
+                <arguments>
+                    <argument name="at_call" xsi:type="string">getProductBullets</argument>
+                    <argument name="at_code" xsi:type="string">product_bullets</argument>
+                    <argument name="css_class" xsi:type="string">product_bullets</argument>
+                    <argument name="at_label" xsi:type="string">none</argument>
+                    <argument name="add_attribute" xsi:type="string">itemprop="product_bullets"</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Catalog\Block\Product\View\Description" name="product.learn.link" template="product/view/learn_link.phtml" before="-" after="product.info.bullets">
+                <arguments>
+                    <argument name="at_call" xsi:type="string">getLearnLink</argument>
+                    <argument name="at_code" xsi:type="string">learn_link</argument>
+                    <argument name="css_class" xsi:type="string">learn_link</argument>
+                    <argument name="at_label" xsi:type="string">none</argument>
+                    <argument name="add_attribute" xsi:type="string">itemprop="learn_link"</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <move element="product.social.main" destination="product.info.title" after="product.learn.link"/>
+    </body>
+</page>

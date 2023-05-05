@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <filters name="listing_filters">
+            <filterSelect name="store_id" provider="${ $.parentName }">
+                <settings>
+                    <captionValue>0</captionValue>
+                    <options class="Magento\Cms\Ui\Component\Listing\Column\Cms\Options"/>
+                    <label translate="true">Store View</label>
+                    <dataScope>store_id</dataScope>
+                    <imports>
+                        <link name="visible">componentType = column, index = ${ $.index }:visible</link>
+                    </imports>
+                </settings>
+            </filterSelect>
+        </filters>
+    </listingToolbar>
+
+    <container name="listing_top">
+        <filterSearch name="fulltext">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="componentDisabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </filterSearch>
+    </container>
+
+    <columns name="subscribenow_product_subscriber_columns">
+        <column name="is_trial" component="Magento_Ui/js/grid/columns/select" sortOrder="90">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Trial</label>
+            </settings>
+        </column>
+
+        <column name="store_id" class="Magento\Store\Ui\Component\Listing\Column\Store" sortOrder="50">
+            <settings>
+                <label translate="true">Store View</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+    </columns>   
+</listing>

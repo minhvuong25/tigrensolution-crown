@@ -1,0 +1,112 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Magento\Framework\App\Action\Action;
+
+/** @var \Magento\CatalogWidget\Block\Product\ProductsList $block */
+?>
+<?php
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$_aloHelper = $this->helper('Magiccart\Alothemes\Helper\Data');
+?>
+<?php if ($exist = ($block->getProductCollection() && $block->getProductCollection()->getSize())) : ?>
+    <?php
+    $type = 'widget-product-grid';
+
+    $mode = 'list';
+
+    $image = 'category_page_grid';
+    $items = $block->getProductCollection()->getItems();
+
+    $showWishlist = true;
+    $showCompare = true;
+    $showCart = true;
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $description = false;
+    ?>
+    <div class="block widget block-products-list block-custom-product <?= /* @noEscape */
+    $mode ?>">
+        <?php if ($block->getTitle()) : ?>
+            <div class="block-title">
+                <strong><?= $block->escapeHtml(__($block->getTitle())) ?></strong>
+            </div>
+        <?php endif ?>
+        <div class="block-content">
+            <?= /* @noEscape */
+            '<!-- ' . $image . '-->' ?>
+            <ol class="products list items product-items">
+                <?php $iterator = 1; ?>
+                <?php foreach ($items as $_item) : ?>
+                    <?= /* @noEscape */
+                    ($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                    <div class="product-item-info" data-container="product-grid">
+                        <div class="images-container">
+                            <div class="product-hover">
+                                <?php //echo $_aloHelper->getTimer($_product); ?>
+                                <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
+                                   class="product photo product-item-photo">
+                                    <?= $block->getImage($_item, $image)->toHtml() ?>
+                                </a>
+                            </div>
+                            <div class="product details product-item-details products-textlink clearfix">
+                                <strong class="product-item-name">
+                                    <a title="<?= $block->escapeHtmlAttr($_item->getName()) ?>"
+                                       href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
+                                       class="product-item-link">
+                                        <?= $block->escapeHtml($_item->getName()) ?>
+                                    </a>
+                                </strong>
+                                <?= $block->getProductPriceHtml($_item, $type) ?>
+                                <?php if ($showCart): ?>
+                                    <div class="hover-box clearfix">
+                                        <div class="product-item-inner actions clearfix">
+                                            <div class="product product-item-actions show-box">
+                                                <div class="actions-no actions-primary actions-cart">
+                                                    <?php if ($_item->isSaleable()): ?>
+                                                        <?php $postParams = $block->getAddToCartPostParams($_item); ?>
+
+                                                        <form data-role="tocart-form"
+                                                              action="<?php echo $postParams['action']; ?>"
+                                                              method="post">
+                                                            <input type="hidden" name="product"
+                                                                   value="<?php echo $postParams['data']['product']; ?>">
+                                                            <input type="hidden"
+                                                                   name="<?php echo Action::PARAM_NAME_URL_ENCODED; ?>"
+                                                                   value="<?php echo $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                                            <?php echo $block->getBlockHtml('formkey') ?>
+                                                            <button type="submit"
+                                                                    title="<?php echo $block->escapeHtml(__('Add to Cart')); ?>"
+                                                                    class="action tocart primary button btn-cart">
+                                                            <span><?php echo __('Add to Cart') ?>
+                                                            </span>
+                                                            </button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <?php if ($_item->getIsSalable()): ?>
+                                                            <div class="stock available">
+                                                                <span><?php /* @escapeNotVerified */
+                                                                    echo __('In stock') ?></span></div>
+                                                        <?php else: ?>
+                                                            <div class="stock unavailable">
+                                                                <span><?php /* @escapeNotVerified */
+                                                                    echo __('Out of stock') ?></span></div>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                        </div>
+                    </div>
+                    <?= ($iterator == count($items) + 1) ? '</li>' : '' ?>
+                <?php endforeach ?>
+            </ol>
+        </div>
+    </div>
+<?php endif; ?>

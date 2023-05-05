@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<!-- This is to make products to open popup to choose subscription option -->
+	<type name="Magento\Catalog\Model\Product">
+		<plugin name="md_subscribenowpro_can_configure_subscription_adminorder" type="Magedelight\SubscribenowPro\Plugin\Magento\Catalog\Model\Product" sortOrder="499" />
+	</type>
+
+	<!-- to get item information by item id, and not by current session + get store price for admin order creation, can include in base as well -->
+	<type name="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription">
+		<plugin name="md_subscribenowpro_get_subscription_for_admin" type="Magedelight\SubscribenowPro\Plugin\Magedelight\Subscribenow\Block\Adminhtml\Catalog\Product\View\Subscription" sortOrder="499" />
+	</type>
+
+	<!-- to get current quote from admin, instead of checkout session -->
+	<type name="Magedelight\Subscribenow\Helper\Data">
+		<plugin name="md_subscribenowpro_admin_current_quote" type="Magedelight\SubscribenowPro\Plugin\Magedelight\Subscribenow\Helper\Data" sortOrder="499" />
+	</type>
+
+	<!-- to get store currency prices in admin create order base amounts -->
+	<type name="Magedelight\Subscribenow\Model\Service\SubscriptionService">
+		<plugin name="md_subscribenowpro_admin_subscriptionservice" type="Magedelight\SubscribenowPro\Plugin\Magedelight\Subscribenow\Model\Service\SubscriptionService" sortOrder="499" />
+	</type>
+
+	<!-- validate max subscription qty against system config for subscription products in cart -->
+	<type name="Magento\Quote\Model\Quote\Item\AbstractItem">
+		<plugin name="md_subscribenowpro_validate_subscription_product_qty" type="Magedelight\SubscribenowPro\Plugin\Magento\Quote\Model\Quote\Item\AbstractItem" sortOrder="499" />
+	</type>
+
+	<!-- for future report -->
+	<type name="Magento\Reports\Model\ResourceModel\Refresh\Collection">
+        <plugin name="md_subscribenowpro_report_futureproducts" type="Magedelight\SubscribenowPro\Plugin\Magento\Reports\Model\ResourceModel\Refresh\Collection" sortOrder="1" />
+    </type>
+
+    <!-- for future report -->
+    <type name="Magento\Reports\Controller\Adminhtml\Report\Statistics">
+        <arguments>
+            <argument name="reportTypes" xsi:type="array">
+                <item name="futureproducts_subscription" xsi:type="string">Magedelight\SubscribenowPro\Model\ResourceModel\Report\FutureProducts</item>
+                <item name="subscribenow_pastrevenue" xsi:type="string">Magedelight\SubscribenowPro\Model\ResourceModel\Report\PastRevenue</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- when creating order form admin, magento removes option _1, to fix this, it is needed -->
+    <preference for="Magento\Sales\Model\AdminOrder\Create" type="Magedelight\SubscribenowPro\Model\AdminOrder\Create" />
+</config>

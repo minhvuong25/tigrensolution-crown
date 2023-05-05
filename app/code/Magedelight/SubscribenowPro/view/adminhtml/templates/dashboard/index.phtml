@@ -1,0 +1,150 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div class="dashboard-container mdssp-dashboard-container row">
+    <div class="dashboard-main mdssp-dashboard-main col-m-12">
+        <div class="dashboard-diagram-container mdssp-dashboard-diagram-container">
+            <div id="diagram_tab" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                <ul class="tabs-horiz ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+                    <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
+                        <a href="#diagram_tab_orders_content" title="Orders" class="ui-tabs-anchor" data-graph="subscription">
+                            <span><?= /* @escapeNotVerified */ __('Subscription') ?></span>
+                        </a>
+                    </li>                  
+                    <li class="ui-state-default ui-corner-top">
+                        <a href="#diagram_tab_orders_content" title="Orders" class="ui-tabs-anchor" data-graph="order">
+                            <span><?= /* @escapeNotVerified */ __('Order') ?></span>
+                        </a>
+                    </li>
+                    <li class="ui-state-default ui-corner-top">
+                        <a href="#diagram_tab_amounts_content" title="Amounts" class="ui-tabs-anchor" data-graph="amount">
+                            <span><?= /* @escapeNotVerified */ __('Amount') ?></span>
+                        </a>
+                    </li>
+               </ul>
+            </div>
+
+            <div class="dashboard-diagram-tab-content mdssp-dashboard-diagram-tab-content">
+                <div class="ui-tabs-panel">
+                    <div class="dashboard-diagram-switcher-container row">
+                        <div class="dashboard-diagram-switcher mdssp-dashboard-diagram-switcher mdssp-dashboard-diagram-switcher-hidden">
+                            <label class="label">Report Data</label>
+                            <select id="reportType" class="admin__control-select">
+                                <option value="subscription"><?= /* @escapeNotVerified */ __('Subscription') ?></option>
+                                <option value="order"><?= /* @escapeNotVerified */ __('Order') ?></option>
+                                <option value="amount"><?= /* @escapeNotVerified */ __('Amount') ?></option>
+                            </select>
+                        </div>
+
+                        <div class="dashboard-diagram-switcher mdssp-dashboard-diagram-switcher">
+                            <label class="label">Chart Type</label>
+                            <select id="chartType" class="admin__control-select">
+                                <?php foreach ($block->getAvailableCharts() as $chart) : ?>
+                                    <option value="<?= /* @escapeNotVerified */ $chart['value'] ?>" <?php if ($chart['value'] == $block->getDefaultChart()) { echo 'selected="selected"';} ?>><?= /* @escapeNotVerified */ $chart['label'] ?></option>    
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="dashboard-diagram-switcher mdssp-dashboard-diagram-switcher">
+                            <div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                <i class="fa fa-calendar"></i>
+                                <span></span> <i class="fa fa-caret-down"></i>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-diagram-switcher mdssp-dashboard-diagram-switcher mdssp-dashboard-diagram-switcher-hidden">
+                            <label class="label">Group By</label>
+                            <select id="reportGroup" class="admin__control-select">
+                                <option value="day"><?= /* @escapeNotVerified */ __('Day') ?></option>
+                                <option value="month"><?= /* @escapeNotVerified */ __('Month') ?></option>
+                                <option value="year"><?= /* @escapeNotVerified */ __('Year') ?></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="chart-container row">
+                        <div id="no_data_available" style="display: none">
+                            <div class="no-data-img-box">
+                                <div class="no-data-img">
+                                    <img src="<?php echo $this->getViewFileUrl('Magedelight_SubscribenowPro::images/no-data.png'); ?>" />
+                                </div>
+                                Oops, No Data Available
+                            </div>
+                        </div>
+
+                        <div id="chart_container">
+                            <div id="chart_print_div" class="item-dashboard">
+                                <a href="javascript:void(0)" class="icon-md-print print_chart" title="<?= /* @escapeNotVerified */ __('Print') ?>"></a>
+                            </div>
+
+                            <div id="print_div" style="display: none">
+                                <div id="chart_image"></div>
+                                <div id="chart_table_ui">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Period</th>
+                                                <th>Result</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="chart" style="width: 100%; height: 500px"></div>
+                        </div>
+
+                    </div>
+
+                    <script type="text/x-magento-init">
+                        {
+                            "*": {
+                                "Magedelight_SubscribenowPro/js/md_subscribenowpro_report": {
+                                    "url":"<?= /* @escapeNotVerified */ $block->getReportUrl() ?>",
+                                    "store_id":"<?= /* @escapeNotVerified */ $block->getStoreId() ?>",
+                                    "defaultPeriod": "<?= /* @escapeNotVerified */ $block->getDefaultPeriod() ?>",
+                                    "isChartMultiColor": "<?= /* @escapeNotVerified */ $block->isChartMultiColor() ?>",
+                                    "defaultChartColor": "<?= /* @escapeNotVerified */ $block->getDefaultChartColor() ?>",
+                                    "isChartToTable": "<?= /* @escapeNotVerified */ $block->isChartToTable() ?>"
+                                }
+                            }
+                        }
+                    </script>
+                </div>
+            </div> 
+        </div> 
+    </div>
+</div>
+
+<div class="dashboard-container mdssp-dashboard-container ">
+    <div class="dashboard-container row">
+        <div class="dashboard-secondary col-m-4">
+            <?= $block->getChildHtml('subscription_statistics') ?>
+        </div>
+        <div class="dashboard-secondary col-m-4">
+            <div class="dashboard-item">
+                <div class="dashboard-item-title"><?= /* @escapeNotVerified */ __('Last Subscriptions') ?></div>
+                <?= $block->getChildHtml('lastSubscriptions') ?>
+            </div>
+        </div>
+        <div class="dashboard-secondary col-m-4">
+            <div class="dashboard-item">
+                <div class="dashboard-item-title"><?= /* @escapeNotVerified */ __('Top Subscription Products') ?></div>
+                <?= $block->getChildHtml('topSubscriptionProducts') ?>
+            </div>            
+        </div>
+    </div>
+</div>

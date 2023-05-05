@@ -1,0 +1,32 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+namespace Magedelight\SubscribenowPro\Model\Config\Source;
+
+use Magento\Framework\Data\OptionSourceInterface;
+
+class Charts implements OptionSourceInterface
+{
+    /**
+     * value should match with JS function name
+     * label is the label, showing in dashboard dropdown
+     */
+    public function toOptionArray()
+    {
+        $res = [];
+        $res[] = ['value' => 'renderGoogleLineChart', 'label' => 'Google Line Chart'];
+        $res[] = ['value' => 'renderGoogleColumnChart', 'label' => 'Google Column Chart'];
+        $res[] = ['value' => 'renderGoogleBarChart', 'label' => 'Google Bar Chart'];
+
+        return $res;
+    }
+}

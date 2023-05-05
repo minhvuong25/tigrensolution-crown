@@ -1,0 +1,51 @@
+<?php
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2022 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_ReviewBooster
+ */
+?>
+<?php
+/**
+ * Copyright © Aitoc. All rights reserved.
+ */
+/** @var \Aitoc\FollowUpEmails\Block\Products $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<?php
+use Magento\Catalog\Api\Data\ProductInterface;
+use Aitoc\FollowUpEmails\Block\Products as ProductsBlock;
+
+/** @var ProductInterface[] $products */
+$products = $block->getData('products');
+$orderReviewUrl = $block->getData('order_review_url') ?? false;
+$productsCount = count($products);
+if (!$productsCount) {
+    return;
+}
+/** @var ProductsBlock $block */
+?>
+<table style="font-family: 'Roboto', sans-serif;" border="0" align="center" width="590" cellpadding="0" cellspacing="0" class="container590">
+    <tr>
+        <?php
+        $linkColor = $block->getData('link_color');
+        if (!$linkColor) {
+            $linkColor = '#09c7ff';
+        }
+
+        $cellWidth =  floor(100 * 100 / $productsCount) / 100;
+
+        foreach ($products as $product):
+            $fullProduct = $block->getFullProductByProduct($product);//todo: prevent this call by load $products with media gallery
+            $escapedProductTrackedLoginUrl = $block->getProductTrackedLoginUrl($fullProduct);
+            $productImageUrl = $block->getProductImageUrl($fullProduct);
+            $escapedProductName = $escaper->escapeHtml($fullProduct->getName());
+            ?>
+            <td style="text-align: center;" width="<?= /* @noEscape */ $cellWidth ?>%">
+                <div><a href="<?= /* @noEscape */ $orderReviewUrl ? $orderReviewUrl : $escapedProductTrackedLoginUrl ?>"><img style="width: 80%;" src="<?= /* @noEscape */ $productImageUrl ?>"/></a></div>
+                <br/>
+                <div style="margin-right: 15px; margin-left: 15px; text-align: center;"><a href="<?= /* @noEscape */ $orderReviewUrl ? $orderReviewUrl : $escapedProductTrackedLoginUrl ?>" style="color: <?= /* @noEscape */ $linkColor ?>; text-decoration: none; font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 400;" ><?= /* @noEscape */ $escapedProductName ?></a></div>
+            </td>
+        <?php endforeach; ?>
+    </tr>
+</table>

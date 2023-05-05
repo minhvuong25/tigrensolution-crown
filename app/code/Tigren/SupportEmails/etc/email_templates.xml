@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Email/etc/email_templates.xsd">
+    <template id="tigren_support_email_support_email_template_upcoming" label="Customer: Email Support Upcoming" file="tigren_support_email_support_email_template_upcoming.html" type="text" module="Tigren_SupportEmails" area="frontend"/>
+    <template id="tigren_support_email_support_email_template_past" label="Custom: Email Support Expired" file="tigren_support_email_support_email_template_past.html" type="text" module="Tigren_SupportEmails" area="frontend"/>
+</config>

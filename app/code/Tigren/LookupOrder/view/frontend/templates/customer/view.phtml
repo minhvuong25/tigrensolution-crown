@@ -1,0 +1,128 @@
+<?php
+$orders = $this->getCurrentOrder();
+?>
+<?php foreach ($orders as $order): ?>
+<?php
+$items = $order->getAllVisibleItems();
+?>
+<div id="maincontent" class="page-main-pal container" style="border: 2px solid #ccc; padding: 5px 20px; margin: 15px">
+    <div class="page-title-wrapper">
+    <h1 class="page-title">
+        <span class="base" data-ui-id="page-title-wrapper"><?= $block->escapeHtmlAttr(__('Order # ')) ?><?=$order->getIncrementId() ?></span>
+    </h1>
+    <span class="order-status"><?= $order->getStatus() ?></span>
+</div>
+    <div class="page messages">
+        <div data-placeholder="messages">
+    </div>
+        <div data-bind="scope: 'messages'">
+        </div>
+    </div>
+    <div class="alocolumns clearfix">
+        <div class="order-date">
+            <?= $block->escapeHtml(__('<span class="label">Order Date:</span> %1', '<date>' . $block->formatDate($order->getCreatedAt(), \IntlDateFormatter::LONG) . '</date>'), ['span', 'date']) ?>
+        </div>
+        <div class="order-email">
+            <span class="label"><?= $block->escapeHtmlAttr(__('Email:')) ?></span>
+            <span><?= $order->getCustomerEmail() ?></span>
+        </div>
+        <div class="order-details-items ordered">
+            <div class="order-title">
+                <strong><?= $block->escapeHtmlAttr(__('Items Ordered')) ?></strong>
+            </div>
+            <div class="table-wrapper order-items">
+                <table class="data table table-order-items" id="my-orders-table" summary="Items Ordered">
+                    <caption class="table-caption"><?= $block->escapeHtmlAttr(__('Items Ordered')) ?></caption>
+                    <thead>
+                        <tr>
+                            <th class="col name"><?= $block->escapeHtmlAttr(__('Product Name')) ?></th>
+                            <th class="col sku"><?= $block->escapeHtmlAttr(__('SKU')) ?></th>
+                            <th class="col qty"><?= $block->escapeHtmlAttr(__('Qty')) ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($items as $item): ?>
+                        <tr id="order-item">
+                            <td class="col name" data-th="Product Name">
+                                <strong class="product name product-item-name"><?= $item->getName() ?></strong>
+                                <dl class="item-options">
+                                    <?php $options = $item->getProductOptions(); ?>
+                                    <?php if (!empty($options['options'])): ?>
+                                    <?php foreach ($options['options'] as $option): ?>
+                                    <dt><?= $option['label'] ?></dt>
+                                    <dd><?= $option['value'] ?></dd>
+                                    <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </dl>
+                            </td>
+                            <td class="col sku" data-th="SKU"><?= $item->getSku() ?></td>
+                            <td class="col qty" data-th="Qty">
+                                <ul class="items-qty">
+                                    <li class="item">
+                                        <span class="title"><?= $block->escapeHtml(__('Ordered')) ?></span>
+                                        <span class="content"><?= (float)$item->getQtyOrdered() ?></span>
+                                    </li>
+                                    <li class="item">
+                                        <span class="title"><?= $block->escapeHtml(__('Shipped')) ?></span>
+                                        <span class="content"><?= (float)$item->getQtyShipped() ?></span>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="block block-order-details-view">
+            <div class="block-title">
+                <strong><?= $block->escapeHtml(__('Order Information')) ?></strong>
+            </div>
+            <div class="block-content">
+                <div class="box box-order-shipping-address">
+                    <strong class="box-title"><span><?= $block->escapeHtml(__('Shipping Address')) ?></span></strong>
+                    <div class="box-content">
+                        <address><?= $this->getFormattedAddress($order->getShippingAddress()) ?></address>
+                    </div>
+                </div>
+                <div class="box box-order-billing-address">
+                    <strong class="box-title">
+                        <span><?= $block->escapeHtml(__('Billing Address')) ?></span>
+                    </strong>
+                    <div class="box-content">
+                        <address><?= $this->getFormattedAddress($order->getBillingAddress()) ?></address>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php if ($order->getStatusHistoryCollection()->count()): ?>
+            <div class="block block-order-note">
+                <div class="order-note-title">
+                    <strong><?= $block->escapeHtml(__('Notes about this order')) ?></strong>
+                </div>
+                <div class="order-note-content">
+                    <ul class="note-list">
+                        <?php foreach ($order->getStatusHistoryCollection() as $status): ?>
+                            <?php  if ($status->getComment()): ?>
+                                <span class="note-list-date"><?= $block->formatDate($status->getCreatedAt(), \IntlDateFormatter::MEDIUM) ?></span>
+                                <span class="note-list-time"><?= $block->formatTime($status->getCreatedAt(), \IntlDateFormatter::MEDIUM) ?></span>
+                                <span class="note-list-customer">
+                                    <?= $block->escapeHtml(__('Customer')) ?>
+                                    <?php if ($status->getIsCustomerNotified()): ?>
+                                        <span class="note-list-customer-notified"><?= $block->escapeHtml(__('Notified')) ?></span>
+                                    <?php else: ?>
+                                        <span class="note-list-customer-not-notified"><?= $block->escapeHtml(__('Not Notified')) ?></span>
+                                    <?php endif; ?>
+                                </span>
+                                <div class="note-list-comment">
+                                    <?= $block->escapeHtml($status->getComment(), ['b', 'br', 'strong', 'i', 'u', 'a']) ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        <?php endif ?>
+    </div>
+</div>
+<?php endforeach; ?>

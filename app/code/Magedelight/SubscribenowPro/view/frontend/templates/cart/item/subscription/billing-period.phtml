@@ -1,0 +1,28 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php if ($block->isCustomerDefined()) : ?>
+    <div class="control select-day">
+        <label for="billing_period_<?= /* @escapeNotVerified */ $block->getItemId()?>" class="label"><span><?= /* @escapeNotVerified */ __('Subscription')?></span></label>
+        <div class="control">
+            <select title="<?= /* @escapeNotVerified */ __('Subscription')?>" class="required" id="billing_period_<?= /* @escapeNotVerified */ $block->getItemId()?>" name="cart[<?=$block->getItemId()?>][subscription][billing_period]">
+                <?php foreach ($block->getBillingPeriods() as $period => $periodLabel) : ?>
+                    <option value="<?=$period?>" <?=$block->isSelected($period)?>><?= /* @escapeNotVerified */ $periodLabel?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+<?php endif; ?>

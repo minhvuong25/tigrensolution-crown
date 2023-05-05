@@ -1,0 +1,61 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php if ($block->isBundle()) : ?>
+<input
+    type="hidden"
+    value="<?= $block->escapeHtml($block->getDiscountConfig()) ?>"
+    id="md_subscription_discount_config"
+    disabled=""
+    class="hidden disable" />
+<?php endif; ?>
+
+<?php if ($block->canPurchaseSeparately()) : ?>
+    <div class="admin__field required">
+        <label class="label admin__field-label">
+            <span><?= /* @escapeNotVerified */ $block->getSubscriptionLabel() ?></span>
+        </label>
+        <div class="control admin__field-control">
+            <select name="options[_1]" id="options__1" class="required product-custom-option admin__control-select" title="" data-selector="options[_1]">
+                <option value="nosubscription" <?= /* @escapeNotVerified */ (!$block->isSubscriptionChecked())?"selected=selected":"" ?>><?= /* @escapeNotVerified */ __('No Subscription') ?></option>
+                <option value="subscription" <?= /* @escapeNotVerified */ ($block->isSubscriptionChecked())?"selected=selected":"" ?>><?= /* @escapeNotVerified */ $block->getSubscriptionLabel() ?></option>
+            </select>
+        </div>
+    </div>
+<?php else : ?>
+    <input type="hidden" value="subscription" name="options[_1]" />
+<?php endif; ?>
+
+<script type="text/javascript">
+    require(["jquery"],
+        function ($) {
+            var subscriptioOption = 'select[name="options[_1]"]'; 
+            if($(subscriptioOption).val() === 'subscription') {
+                $('.md_subscription_content').show();
+            }
+            $(subscriptioOption).on('change', function(event){
+                if (event.originalEvent !== undefined) {
+                    var subscriptionType = $(this).val();
+                    
+                    if(subscriptionType == "subscription"){
+                        $('.md_subscription_content').show();
+                    }else{
+                        $('.md_subscription_content').hide();
+                    }
+                }
+            });
+        }
+    );
+</script>

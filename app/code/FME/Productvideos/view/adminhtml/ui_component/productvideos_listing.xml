@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">productvideos_listing.productvideos_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New File</label>
+            </button>
+        </buttons>
+        <spinner>productvideos_columns</spinner>
+        <deps>
+            <dep>productvideos_listing.productvideos_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="productvideos_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">video_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <!-- <aclResource>FME_Productvideos::productvideos</aclResource> -->
+        <dataProvider class="FME\Productvideos\Ui\Component\DataProvider" name="productvideos_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>video_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters">
+            <settings>
+                <templates>
+                    <filters>
+                        <select>
+                            <param name="template" xsi:type="string">ui/grid/filters/elements/ui-select</param>
+                            <param name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</param>
+                        </select>
+                    </filters>
+                </templates>
+            </settings>
+            <filterSelect name="store_id" provider="${ $.parentName }">
+                <settings>
+                    <captionValue>0</captionValue>
+                    <options class="Magento\Cms\Ui\Component\Listing\Column\Cms\Options"/>
+                    <label translate="true">Store View</label>
+                    <dataScope>store_id</dataScope>
+                    <imports>
+                        <link name="visible">componentType = column, index = ${ $.index }:visible</link>
+                    </imports>
+                </settings>
+            </filterSelect>
+        </filters>        
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete selected items?</message>
+                        <title translate="true">Delete items</title>
+                    </confirm>
+                    <url path="productvideosadmin/productvideos/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="productvideosadmin/productvideos/massDisable"/>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="productvideosadmin/productvideos/massEnable"/>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="edit">
+                <settings>
+                    <callback>
+                        <target>editSelected</target>
+                        <provider>productvideos_listing.productvideos_listing.productvideos_columns_editor</provider>
+                    </callback>
+                    <type>edit</type>
+                    <label translate="true">Edit</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="productvideos_columns">
+        <settings>
+            <editorConfig>
+                <param name="clientConfig" xsi:type="array">
+                    <item name="saveUrl" xsi:type="url" path="productvideosadmin/productvideos/inlineEdit"/>
+                    <item name="validateBeforeSave" xsi:type="boolean">false</item>
+                </param>
+                <param name="indexField" xsi:type="string">video_id</param>
+                <param name="enabled" xsi:type="boolean">true</param>
+                <param name="selectProvider" xsi:type="string">productvideos_listing.productvideos_listing.productvideos_columns.ids</param>
+            </editorConfig>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">productvideos_listing.productvideos_listing.productvideos_columns_editor</item>
+                    <item name="target" xsi:type="string">startEdit</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        <item name="1" xsi:type="boolean">true</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>video_id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="video_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="sorting" xsi:type="string">asc</item>
+                    <item name="label" xsi:type="string" translate="true">ID</item>
+                </item>
+            </argument>
+        </column>
+        <column name="thumbnail" class="FME\Productvideos\Ui\Component\Listing\Column\Thumbnail">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/thumbnail</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="altField" xsi:type="string">name</item>
+                    <item name="has_preview" xsi:type="string">1</item>
+                    <item name="label" xsi:type="string" translate="true">Thumbnail</item>
+                </item>
+            </argument>
+        </column>
+        <column name="title">
+            <argument name="data" xsi:type="array">
+                <item name="js_config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/column</item>
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="align" xsi:type="string">left</item>
+                    <item name="label" xsi:type="string" translate="true">Title</item>
+                </item>
+            </argument>
+        </column>
+        <column name="store_id" class="FME\Productvideos\Ui\Component\Listing\Column\Store">
+            <argument name="data" xsi:type="array">
+                <item name="js_config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/column</item>
+                </item>
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="align" xsi:type="string">left</item>
+                    <item name="label" xsi:type="string" translate="true">Store View</item>
+                </item>
+            </argument>
+        </column>
+        <column name="status">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">FME\Productvideos\Model\Status</item>
+                <item name="config" xsi:type="array">
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">select</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">false</item>
+                        </item>
+                    </item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Status</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn name="actions" class="FME\Productvideos\Ui\Component\Listing\Column\ProductvideosActions">
+            <settings>
+                <indexField>video_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

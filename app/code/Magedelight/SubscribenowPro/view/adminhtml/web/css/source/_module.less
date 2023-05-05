@@ -1,0 +1,60 @@
+@import 'module/pages/_dashboard.less';
+
+@magedelightsubscribenowpro-icons-admin__font-name-path: '@{baseDir}Magedelight_SubscribenowPro/fonts/print/icon';
+@magedelightsubscribenowpro-icons-admin__font-name : 'SubscribenowPro';
+.lib-font-face(
+    @family-name:@magedelightsubscribenowpro-icons-admin__font-name,
+    @font-path: @magedelightsubscribenowpro-icons-admin__font-name-path,
+    @font-weight: normal,
+    @font-style: normal
+);
+
+/*
+.item-md-subscribenow-dashboard a:before {  
+    font-family: 'Admin Icons';
+    font-style: normal;
+    font-weight: normal;
+    content: '\e604';
+    font-size: 1.8rem;
+    padding-right: 8px;
+}
+*/
+
+#chart_print_div .icon-md-print {
+    margin-right: 60px;
+}
+
+.icon-md-print, .icon-md-print:hover {
+    color: #4c4c4b;
+    text-decoration: none;
+}
+
+.icon-md-print:before {
+    font-family: @magedelightsubscribenowpro-icons-admin__font-name;
+    content: "\e954";
+    font-size: 2.4rem;
+
+}
+
+.md_deeplink_available {
+    color: #41362f;
+    text-decoration: none;
+}
+
+.md_deeplink_available:hover {
+    color: #eb5202;
+    text-decoration: none;      
+}
+
+.md_deeplink_available:after {
+    -webkit-font-smoothing: antialiased;
+    font-family: 'Admin Icons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    speak: none;
+
+    content: '\e644';
+    font-size: 0.8rem;
+    vertical-align: super;
+}

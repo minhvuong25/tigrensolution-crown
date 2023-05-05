@@ -1,0 +1,59 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div class="admin__field <?php if ($block->isCustomerDefined()) : ?>required <?php endif; ?>md_subscription_content" style="<?= /* @escapeNotVerified */ ($block->canDisplayContent())?'':'display: none;' ?>">
+    <label class="label admin__field-label">
+        <span><?= /* @escapeNotVerified */ __('Subscription Start Date') ?></span>
+    </label>
+    <?php if ($block->isCustomerDefined()) : ?>
+        <div class="control admin__field-control">
+            <input type="text" id="md_subscription_start" readonly="readonly" name="subscription_start_date" class="input-text admin__control-text product-custom-option" value="" />
+            <script type="text/javascript">
+                require(["jquery", "mage/calendar"], function ($) {
+                    $('#md_subscription_start').calendar({
+                        showsTime: false,
+                        changeMonth: false,
+                        changeYear: false,
+                        showOn: 'focus',
+                        hideIfNoPrevNext: true,
+                        showAnim: "",
+                        buttonImageOnly: null,
+                        buttonImage: null,
+                        showButtonPanel: false,
+                        showOtherMonths: false,
+                        showWeek: false,
+                        timeFormat: '',
+                        showTime: false,
+                        showHour: false,
+                        showMinute: false,
+                        buttonText: "<?= /* @escapeNotVerified */ __('Select Date') ?>",
+                        dateFormat: "yy-mm-dd",
+                        minDate: new Date('<?= /* @escapeNotVerified */ $block->getCurrentDate() ?>')
+                    });
+                    $("#md_subscription_start").calendar().datepicker("setDate", new Date('<?= /* @escapeNotVerified */ $block->getSubscriptionSelectedDate() ?>'));
+                });
+            </script>
+        </div>
+    <?php else : ?>
+        <div class="control admin__field-control">
+            <div class="admin__field-control">
+                <div class="admin__field admin__field-option">
+                    <label class="admin__field-label"><?= /* @escapeNotVerified */ $block->getSubscriptionDate() ?></label>
+                </div>
+            </div>
+            <input type="hidden" name="subscription_start_date" value="<?= /* @escapeNotVerified */ $block->getSubscriptionDate() ?>" />
+        </div>
+    <?php endif; ?>
+</div>

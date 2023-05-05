@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="tigren_lookuporder" translate="label" sortOrder="1000">
+            <label>Tigren</label>
+        </tab>
+        <section id="tigren_lookup_order" translate="label" type="text" sortOrder="1999" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Lookup Order</label>
+            <tab>tigren</tab>
+            <resource>Tigren_LookupOrder::config</resource>
+            <group id="lookup_order" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="customer_groups" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select customer group with access rights</label>
+                    <source_model>Tigren\LookupOrder\Model\System\Config\Source\Customer\Group</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

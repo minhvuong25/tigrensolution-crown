@@ -1,0 +1,156 @@
+<?php
+/**
+ * FME Extensions
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the fmeextensions.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.fmeextensions.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category  FME
+ * @author     Atta <support@fmeextensions.com>
+ * @package   FME_Productvideos
+ * @copyright Copyright (c) 2019 FME (http://fmeextensions.com/)
+ * @license   https://fmeextensions.com/LICENSE.txt
+ */
+?>
+<?php $_helper = $this->helper(Magento\Catalog\Helper\Output::class); ?>
+<?php $_product = $block->getProduct(); ?>
+
+<div class="product-add-form">
+    <form data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>"
+          action="<?= $block->escapeUrl($block->getSubmitUrl($_product)) ?>" method="post"
+          id="product_addtocart_form"<?php if ($_product->getOptions()) :?> enctype="multipart/form-data"<?php endif; ?>>
+        <input type="hidden" name="product" value="<?= (int)$_product->getId() ?>" />
+        <input type="hidden" name="selected_configurable_option" value="" />
+        <input type="hidden" name="related_product" id="related-products-field" value="" />
+        <input type="hidden" name="item"  value="<?= (int)$block->getRequest()->getParam('id') ?>" />
+        <?= $block->getBlockHtml('formkey') ?>
+        <?= $block->getChildHtml('form_top') ?>
+        <?php if (!$block->hasOptions()) :?>
+            <?= $block->getChildHtml('product_info_form_content') ?>
+        <?php else :?>
+            <?php if ($_product->isSaleable() && $block->getOptionsContainer() == 'container1') :?>
+                <?= $block->getChildChildHtml('options_container') ?>
+            <?php endif;?>
+        <?php endif; ?>
+
+        <?php if ($_product->isSaleable() && $block->hasOptions() && $block->getOptionsContainer() == 'container2') :?>
+            <?= $block->getChildChildHtml('options_container') ?>
+        <?php endif;?>
+        <?= $block->getChildHtml('form_bottom') ?>
+    </form>
+</div>
+<?php 
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$provideo = $objectManager->create('FME\Productvideos\Block\Productvideos');
+$product_videos = $provideo->getProductVideos();
+$flag=0;
+
+?>
+<?php if ($provideo->_helper->productVideosEnable()) : ?>
+<?php if (count($product_videos)>0) : ?>
+<?php if (1): ?>
+	<div id="gallery1" style="display:none;">
+			<?php
+				$i = 1;
+				foreach ($product_videos as $_item):
+			?> 
+
+			<?php if ($_item['video_type']=="file"): ?>
+				<?php $img_url = $provideo->_helper->getImageUrl($_item['video_thumb']); ?>
+				
+				<?php 
+                    $file_info = pathinfo($_item['video_file']); 
+					$file_ext = $file_info['extension']; 
+				?>
+                <?php   if(!($file_ext == 'flv' || $file_ext == 'FLV' )): ?> 
+					<?php $flag=1 ?>  
+					<img alt="<?php echo $_item['title']; ?>"
+					src="<?php echo $img_url; ?>"
+					data-type="html5video"
+					data-videomp4="<?php echo $provideo->_helper->getMediaUrl().$_item['video_file']; ?>"
+					data-title="<?php echo $_item['title']; ?>"
+					data-description="<?php echo $_item['content']; ?>">	
+				<?php endif; ?>	
+			<?php endif; ?>
+                                
+			<?php if ($_item['video_type']=="url"): ?>
+				<?php if ( $provideo->_helper->videoType($_item['video_url'])=="youtube"): ?>
+					<?php $flag=1 ?> 
+					<?php $img_url = $provideo->_helper->getImageUrl($_item['video_thumb']); ?>
+					<img alt="<?php echo $_item['title']; ?>"
+					data-type="youtube"
+					data-image="<?php echo $img_url; ?>"
+					<?php  
+						$url = $_item["video_url"];
+						parse_str( parse_url( $url, PHP_URL_QUERY ), $my_array_of_vars );           
+					?> 
+					data-videoid="<?php echo $my_array_of_vars['v']; ?>"
+					data-title="<?php echo $_item['title']; ?>"
+					data-description="<?php echo $_item['content']; ?>">
+				<?php endif; ?>
+				<?php if ( $provideo->_helper->videoType($_item['video_url'])=="vimeo"): ?>
+					<?php $flag=1 ?> 
+					<?php $img_url = $provideo->_helper->getImageUrl($_item['video_thumb']); ?>
+					<img alt="<?php echo $_item['title']; ?>"
+					data-type="vimeo"
+					data-image="<?php echo $img_url; ?>"
+					<?php  
+						$url = $_item["video_url"];
+						//parse_str( parse_url( $url, PHP_URL_QUERY ), $my_array_of_vars );           
+					?> 
+					data-videoid="<?php echo substr(parse_url($url, PHP_URL_PATH), 1) ?>"
+					data-title="<?php echo $_item['title']; ?>"
+					data-description="<?php echo $_item['content']; ?>">
+				<?php endif; ?>
+			<?php endif; ?>
+			<?php
+				$i++;
+				endforeach;
+			?>
+		</div>
+		<script type="text/javascript">
+		setTimeout(
+    function() {
+		require(['jquery','ugallery','uthemecarousel'], function ($) {
+			$("#gallery1").unitegallery({
+				gallery_theme: "carousel",
+			});
+			});
+    }, 2000);
+		
+			</script>
+<?php endif; ?> 
+<script>
+require([
+        'jquery'
+    ], function($){
+var element = $('#gallery1').detach();
+$('.product-info-main').append(element);
+});
+</script>
+<script>
+    require([
+        'jquery',
+        'priceBox'
+    ], function($){
+        var dataPriceBoxSelector = '[data-role=priceBox]',
+            dataProductIdSelector = '[data-product-id=<?= $block->escapeHtml($_product->getId()) ?>]',
+            priceBoxes = $(dataPriceBoxSelector + dataProductIdSelector);
+
+        priceBoxes = priceBoxes.filter(function(index, elem){
+            return !$(elem).find('.price-from').length;
+        });
+
+        priceBoxes.priceBox({'priceConfig': <?= /* @noEscape */ $block->getJsonConfig() ?>});
+    });
+</script>
+<?php endif; ?> 
+<?php endif; ?> 

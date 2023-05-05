@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Thumbnail</title>
+        <link src="Magento_ProductVideo::js/get-video-information.js"/>
+    </head>
+    <body>
+        <referenceBlock name="menu">
+            <action method="setActive">
+                <argument name="itemId" xsi:type="string">Tigren_ProductThumbnail::productthumbnail_thumbnail</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">1</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Tigren\ProductThumbnail\Block\Adminhtml\Thumbnail\Edit" name="thumbnail_edit"/>
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Tigren\ProductThumbnail\Block\Adminhtml\Thumbnail\Edit\Tabs" name="thumbnail_edit_tabs">
+                <block class="Tigren\ProductThumbnail\Block\Adminhtml\Thumbnail\Edit\Tab\Form" name="thumbnail_edit_tab_form"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">thumbnail_edit_tab_form</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,80 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * @var \Magento\Theme\Block\Html\Header $block
+ */
+
+?>
+
+<link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet"> 
+<link href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,300,400,700&amp;subset=cyrillic,latin-ext,vietnamese" rel="stylesheet"> 
+ 
+<header class="page-header alothemes">
+    <div class="header">
+        <div class="header-top">
+			<div class="container">
+			     <div class="tool-setting top-mobile">
+    				<div class="header-setting">
+				    	<div class="settting-switcher">
+					    	<div class="top-form-language">
+								<?php echo $this->getChildHtml('store_language'); ?>
+							</div>
+					    </div>
+				    </div>
+				    <div class="header-setting currency_top">
+				    	<div class="settting-switcher">
+					    	<?php echo $this->getChildHtml('currency'); ?>
+					    </div>
+				    </div>
+    			</div>
+				<div class="top-right top-mobile">
+					<?php echo $this->getChildHtml('header.links'); ?>
+					<div class="top-link-product">
+						<a title="Compare" href="<?php echo $this->getUrl('catalog/product_compare') ?>" target="_blank" class="btn-compare compare"><?php echo __('Compare'); ?></a>
+						<a title="My wishlist" href="<?php echo $this->getUrl('wishlist') ?>" class="btn-wishlist wishlist"><?php echo __('wishlist'); ?></a>
+						<a title="Checkout" href="<?php echo $this->getUrl('checkout') ?>" class="btn-wishlist Checkout"><?php echo __('Checkout'); ?></a>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<div class="header-content">
+			<div class="container">
+				<div class="row clearfix">
+				    <div class="content-logo col-sm-3 col-md-3 col-lg-3">
+						<div class="header-logo">
+							<?php echo $this->getChildHtml('logo'); ?>
+						</div>
+					</div>
+					<div class="tool-topsearch col-sm-7 col-md-6 col-lg-6">
+						<?php echo $this->getChildHtml('top.search'); ?>
+                   </div>
+			    	<div class="content-cart menu-mobile col-sm-5 col-md-3 col-lg-3">
+			    		<div class="tool-header">
+							<?php echo $this->getChildHtml('minicart'); ?>
+							<span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
+			    		</div>
+			    	</div>
+				</div>
+			</div>
+		</div>
+		<div class="header-bottom">
+            <div class="header-sticker">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-12 visible-md-on">
+						    <div class="custom-menu">
+								<?php echo $this->getChildHtml('navigation.sections'); ?>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>		
+	</div>
+</header>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+	    <tigren_categoryvideo>
+            <general>
+                <video_url>https://www.youtube.com/embed/pk-DCzU3rFI?autoplay=0</video_url>
+            </general>
+	    </tigren_categoryvideo>
+	</default>
+</config>

@@ -1,0 +1,106 @@
+<?php
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2022 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_ReviewBooster
+ */
+?>
+<?php
+/**
+ * Copyright © Aitoc. All rights reserved.
+ */
+
+/** @var \Magento\Review\Block\Product\View\ListView $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Aitoc\ReviewBooster\Helper\Rating $helperRating */
+/** @var \Magento\Review\Model\Review $items */
+/** @var array $reviewRatingNames */
+/** @var Magento\Review\Model\ResourceModel\Review\Collection $reviewsCollection */
+?>
+<?php
+$product = $block->getProduct();
+/** @phpstan-ignore-next-line */
+$rating = $helperRating->getRatingSummary($product);
+$voteCount = 0;
+/** @phpstan-ignore-next-line */
+foreach ($items as $ratingItem) {
+    $voteCount += $ratingItem->getVoteCount();
+}
+?>
+<?php if ($rating): ?>
+    <div class="rating-summary">
+        <?php /** @phpstan-ignore-next-line */ ?>
+        <div class="rating-result" title="<?= /* @noEscape */ $reviewRatingNames[$helperRating->convertRatingToPoints($rating, true)] ?>">
+            <?php /** @phpstan-ignore-next-line */ ?>
+            <span style="width:<?= /* @noEscape */ $rating; ?>%"><span><?= $escaper->escapeHtml(__('%1 out of 5 stars', $helperRating->convertRatingToPoints($rating))) ?></span></span>
+        </div>
+        <div class="rating-mark">
+            <?php /** @phpstan-ignore-next-line */ ?>
+            <span><?= /* @noEscape */ $reviewRatingNames[$helperRating->convertRatingToPoints($rating, true)] ?></span>
+        </div>
+        <div class="rating-stat">
+            <?php /** @phpstan-ignore-next-line */ ?>
+            <span><?=  $escaper->escapeHtml(__('%1 out of 5 stars, based on %2 votes', $helperRating->convertRatingToPoints($rating), $voteCount)) ?></span>
+        </div>
+    </div>
+    <div class="rating-results">
+        <div class="rating-mark-box">
+            <?php /** @phpstan-ignore-next-line */ ?>
+            <?php $detailedRating = $helperRating->getDetailedRating($reviewsCollection); ?>
+            <?php foreach ($detailedRating as $star => $singleRating): ?>
+                <?php /** @phpstan-ignore-next-line */ ?>
+                <?php $percent = $helperRating->calculateSingleRating(array_sum($detailedRating), $singleRating); ?>
+                <div class="rate-wrapper">
+                    <div class="rating-bar-label">
+                        <?php if ($star > 1): ?>
+                            <?= $escaper->escapeHtml(__('%1 stars', $star)) ?>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml(__('%1 star', $star)) ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="rating-bar-wrapper">
+                        <?php if ($percent > 0): ?>
+                        <a href="?rating=<?= /* @noEscape */ $star ?>#reviews">
+                            <?php endif; ?>
+                            <div class="rating-bar">
+                                <div style="width: <?= /* @noEscape */ $percent ?>%;" class="rating-bar-filling"></div>
+                            </div>
+                            <?php if ($percent > 0): ?>
+                        </a>
+                    <?php endif; ?>
+                    </div>
+                    <div class="rating-percents">
+                        <?= /* @noEscape */ $percent ?>%
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="review-button">
+            <div class="rb-title"><?= $escaper->escapeHtml(__('Share your thoughts with others')) ?></div>
+            <div class="actions-toolbar review-form-actions">
+                <div class="primary actions-primary">
+                    <button type="submit" class="action submit primary write-action"><span><?= $escaper->escapeHtml(__('Write Review')) ?></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery'
+    ], function ($) {
+        $('.review-list .review-form-actions button.write-action').click(function (event) {
+            event.preventDefault();
+            var acnchor = 'review-form';
+            $(".product.data.items [data-role='content']").each(function (index) {
+                if (this.id == 'reviews') {
+                    $('.product.data.items').tabs('activate', index);
+                    $('html, body').animate({
+                        scrollTop: $('#' + acnchor).offset().top - 50
+                    }, 300);
+                }
+            });
+        });
+    });
+</script>

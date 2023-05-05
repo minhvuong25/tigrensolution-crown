@@ -1,0 +1,45 @@
+<?php
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2022 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_ReviewBooster
+ */
+?>
+<?php
+/**
+ * Copyright © Aitoc. All rights reserved.
+ */
+/** @var \Aitoc\ReviewBooster\ViewModel\Order\Products $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<?php
+$reviewOrder = $block->getData('review_order');
+$orderProducts = $reviewOrder->getOrderProducts();
+if (!$orderProducts) {
+    return '';
+}
+?>
+<div class="order-review-products">
+    <?php foreach ($orderProducts as $item): ?>
+        <?php $product = $reviewOrder->getProductById($item->getProductId()) ?>
+        <?php if (!$product) { continue;} ?>
+
+        <div class="product-container"
+             data-order-product-id="<?= $escaper->escapeHtml($product->getId()) ?>"
+             data-order-product-name="<?= $escaper->escapeHtml($product->getName()) ?>"
+        >
+            <div class="product-image-container product-image-container-<?= $escaper->escapeHtml($product->getId()) ?>">
+                <img class=""
+                     src="<?= /* @noEscape */ $reviewOrder->getProductImageUrl($product) ?>"
+                />
+            </div>
+            <div class="product-name-container">
+                <?= $escaper->escapeHtml($product->getName()) ?>
+            </div>
+
+            <div class="product-review-btn-container">
+                <a href="#"><?= $escaper->escapeHtml(__('Review')) ?></a>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>

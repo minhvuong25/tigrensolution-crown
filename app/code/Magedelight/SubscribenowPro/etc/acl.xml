@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magedelight_Base::root">
+                    <resource id="Magedelight_Base::md_modules">
+                        <resource id="Magedelight_Subscribenow::root">
+                            <resource id="Magedelight_Subscribenow::dashboard" title="Dashboard" sortOrder="5" />
+                            <resource id="Magedelight_Subscribenow::subscribenow_report">
+                                <resource id="Magedelight_SubscribenowPro::report_futureproducts" title="Future Products" sortOrder="30" />
+
+                                <resource id="Magedelight_SubscribenowPro::report_pastrevenue" title="Past Revenue" sortOrder="50" />
+                                <resource id="Magedelight_SubscribenowPro::report_futurerevenue" title="Future Revenue" sortOrder="60" />
+                                <resource id="Magedelight_SubscribenowPro::report_subscriptioncycle" title="Subscription Cycle" sortOrder="70" />
+                            </resource>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

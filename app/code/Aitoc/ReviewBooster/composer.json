@@ -1,0 +1,24 @@
+{
+    "name": "aitoc/review-booster",
+    "description": "Review Booster",
+    "require": {
+        "ext-json": "*",
+        "ext-intl": "*",
+        "magento/framework": "^102.0.0|^103.0.0",
+        "aitoc/follow-up-emails": "~1.1.0",
+        "aitoc/core": ">=1.0.14"
+    },
+    "type": "magento2-module",
+    "version": "2.1.2",
+    "license": [
+        "Commercial"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Aitoc\\ReviewBooster\\": ""
+        }
+    }
+}

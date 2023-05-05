@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_product_view" />
+    <body>
+        <referenceContainer name="div.sidebar.additional" remove="true"/>
+        <referenceContainer name="header.container" remove="true"/>
+        <referenceContainer name="footer-container" remove="true"/>
+        <referenceContainer name="sections.page.bottom" remove="true"/>
+        <referenceBlock name="breadcrumbs" remove="true"/>
+        <referenceBlock name="alothemes_header" remove="true"/>
+        <referenceContainer name="content">
+            <container name="product.view" htmlTag="div" htmlClass="product-view product-quickview" before="-">
+                <container name="product.essential" htmlTag="div" htmlClass="product-essential" before="-">
+                    <container name="product.detail" htmlTag="div" htmlClass="row-normal" before="-">
+                        <container name="product.info.media" htmlTag="div" htmlClass="product-media product media product-img-box clearfix col-md-5 col-sm-5 col-xs-12" before="-">
+                            <block class="Magento\Catalog\Block\Product\View\Gallery" name="product.info.media.image" template="product/view/gallery.phtml">
+                                <arguments>
+                                    <argument name="gallery_options" xsi:type="object">Magento\Catalog\Block\Product\View\GalleryOptions</argument>
+                                    <argument name="imageHelper" xsi:type="object">Magento\Catalog\Helper\Image</argument>
+                                </arguments>
+                            </block>
+                        </container>
+                    </container>
+                </container>
+            </container>
+            <referenceBlock name="product.info.social" remove="true"/>
+            <referenceBlock name="product.info.tabs" remove="true"/>
+            <referenceBlock name="product.info.overview" remove="true"/>
+            <referenceBlock name="help.block" remove="true"/>
+        </referenceContainer>
+
+<!--        <move element="product.info.media" destination="product.detail" before="-"/>-->
+<!--        <move element="product.info.main" destination="product.detail" after="product.info.media"/>-->
+<!--         <move element="product.info.overview" destination="product.info.main" after="product.info.price" before="product.info.addtocart"/> -->
+        <referenceContainer name="product.view" htmlClass="product-view product-quickview" />
+        <referenceContainer name="product.detail" htmlClass="row-normal" />
+    </body>
+</page>

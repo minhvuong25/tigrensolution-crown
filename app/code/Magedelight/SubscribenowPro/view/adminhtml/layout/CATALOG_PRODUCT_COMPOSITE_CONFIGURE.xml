@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <referenceContainer name="root">
+        <referenceBlock name="product.composite.fieldset">
+            <block before="product.composite.fieldset.options" class="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription" name="product.composite.fieldset.options.subscription" as="options_subscription" template="Magedelight_SubscribenowPro::catalog/product/view/subscription.phtml">
+                <block class="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription\Type" name="subscription.type" template="Magedelight_SubscribenowPro::catalog/product/view/subscription/type.phtml" />
+                <block class="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription\BillingPeriod" name="billing.period" template="Magedelight_SubscribenowPro::catalog/product/view/subscription/billing-period.phtml" />
+                <block class="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription\BillingDate" name="billing.date" template="Magedelight_SubscribenowPro::catalog/product/view/subscription/billing-date.phtml" />
+                <block class="Magedelight\Subscribenow\Block\Catalog\Product\View\Subscription\AdditionalInfo" name="additional.info" template="Magedelight_SubscribenowPro::catalog/product/view/subscription/additional-info.phtml" />
+            </block>
+        </referenceBlock>
+    </referenceContainer>
+</layout>

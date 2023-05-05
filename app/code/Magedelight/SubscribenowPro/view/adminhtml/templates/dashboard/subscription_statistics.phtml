@@ -1,0 +1,38 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php if (sizeof($block->getSubscriptionStatistics()) > 0) : ?>
+    <?php foreach ($block->getSubscriptionStatistics() as $statistic) : ?>
+    <div class="dashboard-item dashboard-item-primary">
+        <div class="dashboard-item-title"><?= /* @escapeNotVerified */ $statistic['label'] ?></div>
+        <div class="dashboard-item-content">
+            <?php $deeplink = $statistic['deeplink'] ?? false; ?>
+
+            <?php if ($deeplink) : ?>
+                <a href="javascript:void(0)" class="md_deeplink_available" data-mage-init='{"md_deeplink_post_redirect": {"redirect": "<?=$deeplink['redirect']?>", "url": "<?=$deeplink['url']?>", "namespace": "<?=$deeplink['namespace']?>", "form_key": "<?=$deeplink['form_key']?>", "data": <?=$block->convertJson($deeplink['data'])?>}}'>
+            <?php endif; ?>
+
+            <strong class="dashboard-sales-value">
+                <?= /* @escapeNotVerified */ $statistic['value'] ?>
+            </strong>
+
+            <?php if ($deeplink) : ?>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endforeach; ?>
+<?php endif; ?>

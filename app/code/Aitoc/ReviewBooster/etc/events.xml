@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Aitoc Team
+ * @copyright Copyright (c) 2022 Aitoc (https://www.aitoc.com)
+ * @package Aitoc_ReviewBooster
+ */
+-->
+<!--
+  ~ Copyright © Aitoc. All rights reserved.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="review_save_after">
+        <observer name="aitoc_reviewbooster_model_save_after" instance="Aitoc\ReviewBooster\Observer\SaveExtendedData"/>
+    </event>
+    <event name="sales_order_place_before">
+        <observer name="add_review_booster_guid_to_order" instance="Aitoc\ReviewBooster\Observer\AddGuidToOrder"/>
+    </event>
+</config>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="mage/gallery/gallery.css"/>
+            <css src="FME_Productvideos::css/style1.css" />
+        <css src="FME_Productvideos::css/upgrade/unite-gallery.css" />
+        <css src="FME_Productvideos::css/upgrade/video/skin-right-no-thumb.css" />
+        <css src="FME_Productvideos::css/upgrade/video/skin-right-thumb.css" />
+     <css src="FME_Productvideos::css/upgrade/video/skin-right-title-only.css" />
+     <css src="FME_Productvideos::css/upgrade/video/skin-bottom-text.css" />
+    </head>
+    <update handle="catalog_product_opengraph" />
+    <update handle="page_calendar"/>
+    <body>
+        
+
+
+        <referenceBlock name="product.info">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">FME_Productvideos::form.phtml</argument>
+            </action>
+        </referenceBlock>
+      
+         <referenceBlock name="product.info.details">
+            <block class="FME\Productvideos\Block\Productvideos" name="productvideos.tab" after="product.info.description" as="productvideos" template="FME_Productvideos::newproductvideos.phtml" group="detailed_info" ifconfig="productvideos/general/enable_module">
+            </block>
+        </referenceBlock>    
+    </body>
+</page>

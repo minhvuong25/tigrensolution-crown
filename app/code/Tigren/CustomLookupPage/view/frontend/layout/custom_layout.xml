@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+
+<!--        <referenceContainer name="content">-->
+<!--            <block class="Tigren\LookupOrder\Block\Widget\Customer\Form" name="customer.form" template="Tigren_CustomLookupPage::custom.phtml"/>-->
+<!--        </referenceContainer>-->
+
+
+                <referenceBlock name="content">
+                    <block class="Tigren\LookupOrder\Block\Widget\Customer\Form" name="my.custom.child.block"
+                           template="Tigren_CustomLookupPage::custom.phtml">
+                    </block>
+                </referenceBlock>
+
+        <!--        <referenceBlock name="customer.lookup.form" template="Tigren_LookupOrder::custom.phtml"/>-->
+
+    </body>
+</page>

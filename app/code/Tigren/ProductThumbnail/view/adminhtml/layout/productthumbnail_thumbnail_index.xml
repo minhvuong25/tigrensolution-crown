@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="formkey"/>
+    <head>
+        <title>Product Thumbnail</title>
+    </head>
+    <body>
+        <referenceBlock name="menu">
+            <action method="setActive">
+                <argument name="itemId" xsi:type="string">Tigren_ProductThumbnail::productthumbnail_thumbnail</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="page.title">
+            <action method="setPageTitle">
+                <argument name="pageTitle" xsi:type="string">Product Thumbnail</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">1</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Tigren\ProductThumbnail\Block\Adminhtml\Thumbnail" name="admin.block.thumbnail.grid.container"/>
+        </referenceContainer>
+    </body>
+</page>

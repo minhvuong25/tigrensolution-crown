@@ -1,0 +1,30 @@
+<?php
+$googlehelper = $this->helper('Magecomp\Googlelangtranslator\Helper\Data');
+$isenabled = $googlehelper->isEnabled();
+if($isenabled) :
+    $lanselected = $googlehelper->SelectLanguage();
+    $layoutselected = $googlehelper->SelectLayout();
+    $bashlanguage = substr($googlehelper->BashLanguage(), 0, 2);
+    $layouthtml = 'layout: google.translate.TranslateElement.InlineLayout.'.$layoutselected; ?>
+
+    <div id="google_translate_element" style="float: left;"></div>
+        <script type="text/javascript">
+            function googleTranslateElementInit()
+            {
+                new google.translate.TranslateElement(
+                    {
+                        pageLanguage: 'zu',
+                        includedLanguages: '<?php echo $lanselected; ?>',
+                        <?php echo $layouthtml; ?>
+                    },
+                    'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <style type="text/css">
+            body { top : 0 !important;}
+            .goog-te-banner-frame.skiptranslate {
+                display: none !important;
+            }
+        </style>
+<?php endif; ?>

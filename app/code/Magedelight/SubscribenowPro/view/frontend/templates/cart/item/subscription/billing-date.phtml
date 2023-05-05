@@ -1,0 +1,28 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<div class="control date-picker">
+    <?php if ($block->isCustomerDefined()) : ?>
+        <label class="label">
+            <?= /* @escapeNotVerified */ __('Subscription Start Date :') ?>
+        </label>
+        <div class="control date-picker">
+            <input type="text" readonly="readonly" name="cart[<?= /* @escapeNotVerified */ $block->getItemId() ?>][subscription][subscription_start_date]" class="input-text input-date-picker" data-date="<?=$block->getSubscriptionSelectedDate(); ?>" data-min-date="<?= /* @escapeNotVerified */ $block->getCurrentDate() ?>" />
+        </div>
+    <?php else : ?>
+        <input type="hidden" name="cart[<?=$block->getItemId()?>][subscription][subscription_start_date]" value="<?= /* @escapeNotVerified */ $block->getSubscriptionDate() ?>" />
+    <?php endif; ?>
+</div>

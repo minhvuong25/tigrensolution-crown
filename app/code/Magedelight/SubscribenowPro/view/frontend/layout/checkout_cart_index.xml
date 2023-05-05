@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="additional.product.info">
+            <block class="Magedelight\SubscribenowPro\Block\Cart\Item\Subscription" name="md.subscribenowpro.cart.item.subscription" template="Magedelight_SubscribenowPro::cart/item/subscription.phtml" after="-">
+            	<block class="Magedelight\SubscribenowPro\Block\Cart\Item\Subscription\Type" name="subscription.type" template="Magedelight_SubscribenowPro::cart/item/subscription/type.phtml" />
+            	<block class="Magedelight\SubscribenowPro\Block\Cart\Item\Subscription\BillingPeriod" name="billing.period" template="Magedelight_SubscribenowPro::cart/item/subscription/billing-period.phtml" />
+                <block class="Magedelight\SubscribenowPro\Block\Cart\Item\Subscription\BillingDate" name="billing.date" template="Magedelight_SubscribenowPro::cart/item/subscription/billing-date.phtml" />
+                <block class="Magedelight\SubscribenowPro\Block\Cart\Item\Subscription\AdditionalInfo" name="additional.info" template="Magedelight_SubscribenowPro::cart/item/subscription/additional-info.phtml" />
+            </block>
+        </referenceBlock>
+
+        <referenceContainer name="before.body.end">
+            <block name="md.subscribenowpro.subscription.js" template="Magedelight_SubscribenowPro::cart/footer.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

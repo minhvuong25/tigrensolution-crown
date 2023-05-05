@@ -1,0 +1,116 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * @var \Magento\Theme\Block\Html\Header $block
+ */
+
+?>
+
+<link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+<link href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,300,400,700&amp;subset=cyrillic,latin-ext,vietnamese" rel="stylesheet">
+
+<header class="page-header alothemes">
+    <div class="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="header-setting">
+                    <div class="settting-switcher">
+                        <?php echo $this->getChildHtml('store_language'); ?>
+                    </div>
+                </div>
+                <div class="top-right top-mobile">
+                    <?php echo $this->getChildHtml('header.links'); ?>
+                    <div class="top-link-product">
+                        <a title="Checkout" href="<?php echo $this->getUrl('checkout') ?>" class="btn-wishlist Checkout"><?php echo __('Checkout'); ?></a>
+                    </div>
+                    <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('social')->toHtml();?>
+                </div>
+            </div>
+        </div>
+        <div class="header-content">
+            <div class="container">
+                <div class="row clearfix">
+                    <div class="content-logo col-sm-12 col-md-3 col-lg-3">
+                        <div class="header-logo">
+                            <?php echo $this->getChildHtml('logo'); ?>
+                        </div>
+                    </div>
+                    <div class="tool-topsearch col-sm-12 col-md-5 col-lg-5">
+                        <?php echo $this->getChildHtml('top.search'); ?>
+                    </div>
+                    <div class="content-cart menu-mobile col-sm-12 col-md-4 col-lg-4">
+                        <div class="tool-header">
+                            <div class="tool-setting">
+                                <div class="header-setting currency_top">
+                                    <div class="settting-switcher">
+                                        <?php echo $this->getChildHtml('currency'); ?>
+                                    </div>
+                                </div>
+                                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('hotline')->toHtml();?>
+                            </div>
+                            <div class="tablet-mobile-my-account">
+                                <div class="visible-xs visible-sm">
+                                    <a href="<?= $block->getUrl('customer/account/login/')?>">
+                                        <i class="fa fa-user-o" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <?php echo $this->getChildHtml('minicart'); ?>
+                        </div>
+                    </div>
+                </div>
+                <span data-action="toggle-nav" class="action nav-toggle"><span class="mobile-text visible-xs visible-sm"><?= /* @escapeNotVerified */  __('Categories') ?></span><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
+            </div>
+        </div>
+        <div class="header-bottom">
+            <div class="header-sticker">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 visible-md-on">
+                            <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('logo_menu_sticky')->toHtml();?>
+                            <?php echo $this->getChildHtml('navigation.sections'); ?>
+                            <div class="tool-setting-fixed">
+                                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('hotline')->toHtml();?>
+                                <div class="bag-icon">
+                                    <a href="<?= $block->getUrl('checkout/cart')?>">
+                                        <img src="<?= $block->getViewFileUrl('images/bag-white.png')?>" alt="bag-icon">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-fixed-menu">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-3 col-sm-3 col-md-3">
+                            <a class="mobile-fixed-menu-logo" href="<?= $block->getUrl()?>">
+                                <img alt="Logo" src="<?= $block->getViewFileUrl('images/logo-mobile.png') ?>">
+                            </a>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-2">
+                            <a class="phone-link" href="tel:800-914-9191"><i class="fa fa-phone" aria-hidden="true"></i></a>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-2">
+                            <a class="cart-link" href="<?= $block->getUrl('checkout/cart/')?>">
+                                <div class="crat-icon"></div>
+                            </a>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-2 sticky-toggle">
+                            <span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ echo __('Toggle Nav') ?></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>

@@ -1,0 +1,207 @@
+.mdssp-dashboard-diagram-switcher {
+    float: left;
+    margin-right: 20px;
+}
+
+.mdssp-dashboard-diagram-switcher-hidden {
+	display: none;
+}
+
+.mdssp-dashboard-container {
+    margin-bottom: 4rem;
+    border-bottom: 1px solid #e3e3e3;
+}
+
+.mdssp-dashboard-container .dashboard-item-primary {
+    float: left;
+    width: 50%;
+}
+
+.mdssp-dashboard-diagram-tab-conten .chart-container {
+    border-top: 1px solid #e3e3e3;
+}
+
+#reportrange span {
+	padding-left: 5px;
+}
+
+/***********/
+@icomoon-font-family: "subscribenow-icon";
+@icomoon-font-path: "fonts";
+
+@icon-pause: "\e900";
+@icon-loop: "\e901";
+@icon-cart: "\e902";
+@icon-history: "\e903";
+@icon-check-mage: "\e904";
+@icon-account: "\e905";
+@icon-active-trails-white: "\e914";
+
+@font-face {
+  font-family: 'subscribenow-icon';
+  src:  url('@{baseDir}Magedelight_SubscribenowPro/fonts/subscribenow-icon.eot');
+  src:  url('@{baseDir}Magedelight_SubscribenowPro/fonts/subscribenow-icon.eot') format('embedded-opentype'),
+    url('@{baseDir}Magedelight_SubscribenowPro/fonts/subscribenow-icon.ttf') format('truetype'),
+    url('@{baseDir}Magedelight_SubscribenowPro/fonts/subscribenow-icon.woff') format('woff'),
+    url('@{baseDir}Magedelight_SubscribenowPro/fonts/subscribenow-icon.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="subscribenow-"] [class^="icon-"],
+[class^="subscribenow-"] [class*=" icon-"],
+[class*=" subscribenow-"] [class^="icon-"],
+[class*=" subscribenow-"] [class*=" icon-"] {
+  font-family: 'subscribenow-icon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-pause:before {
+  content: "\e900";
+}
+.icon-loop:before {
+  content: "\e901";
+}
+.icon-cart:before {
+  content: "\e902";
+}
+.icon-history:before {
+  content: "\e903";
+}
+.icon-check-mage:before {
+  content: "\e904";
+}
+.icon-account:before {
+  content: "\e905";
+}
+
+.no-data-img-box {
+    text-align: center;
+    font-weight: bold;
+    color: #a2a2a2;
+}
+.mdssp-dashboard-container {
+    .dashboard-item-primary {
+        position: relative;
+        padding-left: 32px;
+        padding-right: 20px;
+        .dashboard-item-title {
+            font-size: 14px;
+            min-height: 39px;
+            line-height: normal;
+            &:before {
+                -webkit-font-smoothing: antialiased;
+                font-family: 'subscribenow-icon';
+                font-style: normal;
+                font-weight: normal;
+                speak: none;
+                font-size: 20px;
+                position: absolute;
+                left: 0;
+            }
+        }
+        &:nth-child(1) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-history;
+                }
+            }
+        }
+        &:nth-child(2) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-loop;
+                }
+            }
+        }
+        &:nth-child(3) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-pause;
+                }
+            }
+        }
+        &:nth-child(4) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-check-mage;
+                }
+            }
+        }
+        &:nth-child(5) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-account;
+                }
+            }
+        }
+        &:nth-child(6) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-active-trails-white;
+                }
+            }
+        }
+        &:nth-child(7) {
+            .dashboard-item-title {
+                &:before {
+                    content: @icon-cart;
+                }
+            }
+        }
+        .dashboard-item-content {
+            .dashboard-sales-value {
+                font-size: 18px;
+            }
+        }
+        &:after {
+            content: "";
+            right: 13px;
+            bottom: 0;
+            position: absolute;
+            background: #ccc;
+            width: 1px;
+            top: 0;
+        }
+        &:before {
+            content: "";
+            left: 0;
+            right: 30px;
+            bottom: -15px;
+            position: absolute;
+            background: #ccc;
+            height: 1px;
+        }
+        &:nth-child(even) {
+            &:after {
+                display: none;
+            }
+        }
+	    &:last-child {
+	        &:before {
+	            display: none;
+	        }
+	    }
+	    &:nth-child(odd) {
+	        &:nth-last-child(2) {
+	            &:before {
+	                display: none;
+	            }
+	        }
+	    }
+    }
+}
+/***********/
+
+#chart_print_div {
+    text-align: right;
+}

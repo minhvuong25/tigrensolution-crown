@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+  ~ /**
+  ~  * @author    Tigren Solutions <info@tigren.com>
+  ~  * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+  ~  * @license   Open Software License ("OSL") v. 1.0.0
+  ~  */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+	    <tigren_support_email>
+            <support_email>
+                <enable>0</enable>
+                <sender>general</sender>
+                <template_upcoming>tigren_support_email_support_email_template_upcoming</template_upcoming>
+                <template_past>tigren_support_email_support_email_template_past</template_past>
+                <coupon_code>1</coupon_code>
+                <product_option>1 Year Support</product_option>
+            </support_email>
+	    </tigren_support_email>
+	</default>
+</config>

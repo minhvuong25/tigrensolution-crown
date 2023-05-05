@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var $block \Magento\Theme\Block\Html\Title
+ * @var $_helper \Tigren\Review\Helper\Data
+ */
+$cssClass = $block->getCssClass() ? ' ' . $block->getCssClass() : '';
+$_helper = $this->helper('Tigren\Review\Helper\Data');
+if (!empty($_helper->getCurrentProduct())) {
+    $sku = $_helper->getCurrentProduct()->getSku();
+}
+$titleHtml = '';
+if (trim($block->getPageHeading())) {
+    $titleHtml = '<span class="base" data-ui-id="page-title-wrapper" '
+        . $block->getAddBaseAttribute()
+        . '>'
+        . $block->escapeHtml($block->getPageHeading())
+        . '</span>';
+}
+?>
+<?php if ($titleHtml) : ?>
+<div class="page-title-wrapper<?= $block->escapeHtmlAttr($cssClass) ?>">
+    <h1 class="page-title"
+        <?php if ($block->getId()) : ?> id="<?= $block->escapeHtmlAttr($block->getId()) ?>" <?php endif; ?>
+        <?php if ($block->getAddBaseAttributeAria()) : ?>
+            aria-labelledby="<?= $block->escapeHtmlAttr($block->getAddBaseAttributeAria()) ?>"
+        <?php endif; ?>>
+        <?= /* @noEscape */ $titleHtml ?>
+    </h1>
+    <?php if (!empty($sku)): ?>
+    <span style="color: #bbb; font-size: 13px">SKU:<?=$sku ?></span>
+    <?php endif; ?>
+    <?= $block->getChildHtml() ?>
+</div>
+<?php endif; ?>

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */ 
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Magedelight_Subscribenow::md_subscribenow_dashboard"
+            title="Dashboard"
+            module="Magedelight_SubscribenowPro"
+            sortOrder="10"
+            action="subscribenow/dashboard/index"
+            parent="Magedelight_Subscribenow::subscribenow_root"
+            resource="Magedelight_Subscribenow::dashboard" />
+
+        <add id="Magedelight_SubscribenowPro::report_futureproducts"
+            title="Future Products"
+            module="Magedelight_SubscribenowPro"
+            sortOrder="30"
+            parent="Magedelight_Subscribenow::subscribenow_report"
+            action="subscribenow/report_futureproducts/report"
+            resource="Magedelight_SubscribenowPro::report_futureproducts" />
+
+        <add id="Magedelight_SubscribenowPro::report_pastrevenue"
+            title="Past Revenue"
+            module="Magedelight_SubscribenowPro"
+            sortOrder="50"
+            parent="Magedelight_Subscribenow::subscribenow_report"
+            action="subscribenow/report_pastrevenue/report"
+            resource="Magedelight_SubscribenowPro::report_pastrevenue" />
+
+        <add id="Magedelight_SubscribenowPro::report_futurerevenue"
+            title="Future Revenue"
+            module="Magedelight_SubscribenowPro"
+            sortOrder="60"
+            parent="Magedelight_Subscribenow::subscribenow_report"
+            action="subscribenow/report_futurerevenue/report"
+            resource="Magedelight_SubscribenowPro::report_futurerevenue" />
+
+        <add id="Magedelight_SubscribenowPro::report_subscriptioncycle"
+            title="Subscription Cycle"
+            module="Magedelight_SubscribenowPro"
+            sortOrder="70"
+            parent="Magedelight_Subscribenow::subscribenow_report"
+            action="subscribenow/report_subscriptioncycle/report"
+            resource="Magedelight_SubscribenowPro::report_subscriptioncycle" />
+    </menu>
+</config>

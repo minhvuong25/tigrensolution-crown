@@ -1,0 +1,143 @@
+/*
+ * @author    Tigren Solutions <info@tigren.com>
+ * @copyright Copyright (c) 2020 Tigren Solutions <https://www.tigren.com>. All rights reserved.
+ * @license   Open Software License ("OSL") v. 3.0
+ */
+
+.testimonial{text-align: center; display:block}
+
+.testimonial-container .pager{
+    display: block;
+}
+
+.testimonial-container .pager .pages strong{
+    display: block;
+    font-size: 14px;
+    height: 31px;
+    width: 100%;
+}
+
+.testimonial-container .pager .pages strong span{
+    display: block;
+    line-height: 32px;
+}
+
+.testimonial-container .pages li a{
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    height: 32px;
+}
+
+.testimonial-index-index .page-title-wrapper h1{
+    text-align: center;
+}
+
+.testimonials-item{
+    background-color: #f2f2f2;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.magiccart-testimonials-grid-left{
+    width: 25%;
+    text-align: center;
+}
+
+.magiccart-testimonials-grid-left img{
+    margin-bottom: 15px;
+}
+
+.magiccart-testimonial-author{
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.magiccart-testimonials-grid-left .rating-box{
+    margin: 0 auto;
+    position: relative;
+    width: 102px;
+    height: 20px;
+    background: unset;
+}
+
+.magiccart-testimonials-grid-left .rating-box:before{
+    content: "\f005" "\f005" "\f005" "\f005" "\f005";
+    font-family: "FontAwesome";
+    color: #ccc;
+    z-index: 2;
+    position: relative;
+    height: 20px;
+    display: block;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 20px;
+}
+
+.magiccart-testimonials-grid-left .rating-box .rating{
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+    height: 20px;
+    background: unset;
+}
+
+.magiccart-testimonials-grid-left .field-summary_rating .rating-box .rating:before{
+    content: "\f005" "\f005" "\f005" "\f005" "\f005";
+    font-family: "FontAwesome";
+    color: #f2c800;
+    z-index: 2;
+    position: relative;
+    font-size: 14px;
+    height: 20px;
+    display: block;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    font-size: 20px;
+}
+
+.magiccart-testimonials-grid-right{
+    width: 75%;
+    font-style: italic;
+    position: relative;
+    padding-left: 50px;
+}
+
+.magiccart-testimonials-grid-right:before{
+    content: "\f10d";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 30px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+@media (max-width: 640px) {
+    .testimonials-item{
+        flex-direction: column;
+    }
+    .magiccart-testimonials-grid-left{
+        margin-bottom: 20px;
+    }
+    .magiccart-testimonials-grid-left,
+    .magiccart-testimonials-grid-right{
+        width: 100%;
+    }
+}
+

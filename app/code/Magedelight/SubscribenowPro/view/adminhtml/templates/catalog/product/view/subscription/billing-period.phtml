@@ -1,0 +1,40 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div class="admin__field md_subscription_content <?php if ($block->isCustomerDefined()) : ?>required<?php endif; ?>" style="<?= /* @escapeNotVerified */ ($block->canDisplayContent())?'':'display: none;' ?>">
+    <?php if ($block->isCustomerDefined()) : ?>
+        <label class="label admin__field-label">
+            <span><?= /* @escapeNotVerified */ __('Subscription') ?></span>
+        </label>
+        <div class="control admin__field-control">
+            <select name="billing_period" id="billing_period" class="required product-custom-option admin__control-select" data-selector="billing_period">
+                <?php foreach ($block->getBillingPeriods() as $period => $periodLabel) : ?>
+                    <option value="<?= /* @escapeNotVerified */ $period ?>" <?= /* @escapeNotVerified */ ($block->getSubscriptionSelectedBillingPeriod() == $period)?"selected=selected":"" ?>><?= /* @escapeNotVerified */ $periodLabel ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    <?php else : ?>
+        <label class="label admin__field-label">
+            <span><?= /* @escapeNotVerified */ __('Subscription') ?></span>
+        </label>
+        <div class="admin__field-control">
+            <div class="admin__field admin__field-option">
+                <label class="admin__field-label"><?= /* @escapeNotVerified */ $block->getAdminDefinedBillingLabel() ?></label>
+            </div>
+
+            <input type="hidden" name="billing_period" id="billing_period" value="<?= /* @escapeNotVerified */ $block->getProduct()->getBillingPeriod() ?>" />
+        </div>
+    <?php endif; ?>
+</div>

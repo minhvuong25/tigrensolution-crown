@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="productvideos" resource="default" engine="innodb" comment="Productvideos Table">
+    <column xsi:type="int" name="video_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="text" name="title" nullable="false" comment="Title"/>
+    <column xsi:type="text" name="content" nullable="true" comment="Content"/>
+    <column xsi:type="text" name="video_type" nullable="false" comment="Video Type"/>
+    <column xsi:type="text" name="video_url" nullable="true" comment="Video Url"/>
+    <column xsi:type="text" name="video_file" nullable="true" comment="Video File"/>
+    <column xsi:type="text" name="video_thumb" nullable="true" comment="Thumbnail"/>
+    <column xsi:type="int" name="status" padding="11" unsigned="false" nullable="false" identity="false" default="1" comment="Status"/>
+    <column xsi:type="timestamp" name="created_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created Time"/>
+    <column xsi:type="timestamp" name="update_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="video_id"/>
+    </constraint>
+    <index referenceId="VIDEO_ID_VIDEO_ID" indexType="btree">
+      <column name="video_id"/>
+    </index>
+  </table>
+  <table name="productvideos_products" resource="default" engine="innodb" comment="Productvideos Product Table">
+    <column xsi:type="int" name="productvideos_related_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Productvideos Related primary key"/>
+    <column xsi:type="int" name="productvideos_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Video id"/>
+    <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Product id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="productvideos_related_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="FK_PRODUCTVIDEOS_PRODUCT_FBK1_VIDEO_ID_PRODUCTVIDEOS_VIDEO_ID" table="productvideos_products" column="productvideos_id" referenceTable="productvideos" referenceColumn="video_id" onDelete="CASCADE"/>
+  </table>
+  <table name="productvideos_store" resource="default" engine="innodb" comment="Productvideos Product Table">
+    <column xsi:type="int" name="productvideos_storerelated_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Productvideos Store Related primary key"/>
+    <column xsi:type="int" name="productvideos_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Video id"/>
+    <column xsi:type="int" name="store_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Store id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="productvideos_storerelated_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="FK_PRODUCTVIDEOS_PRODUCT_FBK2_VIDEO_ID_PRODUCTVIDEOS_VIDEO_ID" table="productvideos_store" column="productvideos_id" referenceTable="productvideos" referenceColumn="video_id" onDelete="CASCADE"/>
+  </table>
+  <table name="productvideos_customer_group" resource="default" engine="innodb" comment="Product attachemnts cms Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="video_id" padding="10" unsigned="true" nullable="false" identity="false" comment="productvideos Id"/>
+    <column xsi:type="int" name="customer_group_id" padding="10" unsigned="true" nullable="false" identity="false" comment="CMS Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="MEDIAGALLERY_CMSPAGE_IBFK_1_VIDEO_ID_PRODUCTVIDEOS_VIDEO_ID" table="productvideos_customer_group" column="video_id" referenceTable="productvideos" referenceColumn="video_id" onDelete="CASCADE"/>
+  </table>
+</schema>

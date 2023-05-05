@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2019 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_SubscribenowPro
+ * @copyright Copyright (c) 2019 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles" />
+    <head>
+        <css src="Magedelight_SubscribenowPro::css/daterangepicker.css" />
+        <css src="https://use.fontawesome.com/releases/v5.0.10/css/all.css" src_type="url" />
+        <!-- google charts -->
+        <script src="https://www.gstatic.com/charts/loader.js" src_type="url"/>
+        <!-- google charts - upto here -->
+    </head>
+    <body>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher" as="store_switcher" template="Magento_Backend::store/switcher.phtml">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">0</argument>
+                </action>
+            </block>
+            <!-- <block class="Magento\Backend\Block\Template" name="refresh_statistics" after="store_switcher" template="Magento_Backend::dashboard/totalbar/refreshstatistics.phtml"/> -->
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magedelight\SubscribenowPro\Block\Adminhtml\Dashboard" name="md_subscribenow_dashboard"/>
+        </referenceContainer>
+    </body>
+</page>

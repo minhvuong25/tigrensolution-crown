@@ -1,0 +1,63 @@
+// /**
+//  * Copyright © 2015 Magento. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//    Common
+//--------------------------------------
+
+& when (@media-common = true) {
+
+    .load.indicator {
+        .lib-loader();
+        position: absolute;
+        > span {
+            display: none;
+        }
+    }
+
+    .loading-mask {
+        .lib-loading-mask();
+        background: rgba(255, 255, 255, .5);
+        .loader {
+            > img {
+                .lib-loading-mask();
+            }
+            > p {
+                display: block;
+                padding-top: 100px;
+                bottom: 0;
+                margin: auto;
+                position: fixed;
+                top: 50%;
+                z-index: 100;
+                left: 50%;
+                transform: translate(-50%,0);
+                color: red;
+            }
+            > span {
+                display: block;
+                padding-top: 100px;
+                bottom: 0;
+                margin: auto;
+                position: fixed;
+                top: 54%;
+                z-index: 100;
+                left: 50%;
+                transform: translate(-50%, 0);
+                color: red;
+            }
+        }
+    }
+
+    body {
+        > .loading-mask {
+            z-index: @loader-overlay__z-index;
+        }
+    }
+
+    ._block-content-loading {
+        position: relative;
+    }
+}

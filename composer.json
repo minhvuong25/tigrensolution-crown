@@ -1,0 +1,93 @@
+{
+    "name": "magento/project-community-edition",
+    "description": "eCommerce Platform for Growth (Community Edition)",
+    "type": "project",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "magento/inventory-composer-installer": true,
+            "magento/magento-composer-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": true
+        }
+    },
+    "version": "2.4.6",
+    "require": {
+        "ext-json": "*",
+        "laminas/laminas-http": "^2.18",
+        "magento/data-migration-tool": "^2.4",
+        "magento/product-community-edition": "2.4.6",
+        "swissup/core": "^1.10",
+        "swissup/easytabs": "^1.8"
+    },
+    "require-dev": {
+        "allure-framework/allure-phpunit": "^2",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+        "dg/bypass-finals": "^1.4",
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "lusitanian/oauth": "^0.8",
+        "magento/magento-coding-standard": "*",
+        "magento/magento2-functional-testing-framework": "^4.2.1",
+        "pdepend/pdepend": "^2.10",
+        "phpmd/phpmd": "^2.12",
+        "phpstan/phpstan": "^1.9",
+        "phpunit/phpunit": "^9.5",
+        "sebastian/phpcpd": "^6.0",
+        "symfony/finder": "^5.4"
+    },
+    "conflict": {
+        "gene/bluefoot": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magento\\Framework\\": "lib/internal/Magento/Framework/",
+            "Magento\\Setup\\": "setup/src/Magento/Setup/",
+            "Magento\\": "app/code/Magento/",
+            "Zend\\Mvc\\Controller\\": "setup/src/Zend/Mvc/Controller/"
+        },
+        "psr-0": {
+            "": [
+                "app/code/",
+                "generated/code/"
+            ]
+        },
+        "files": [
+            "app/etc/NonComposerComponentRegistration.php"
+        ],
+        "exclude-from-classmap": [
+            "**/dev/**",
+            "**/update/**",
+            "**/Test/**"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Magento\\Sniffs\\": "dev/tests/static/framework/Magento/Sniffs/",
+            "Magento\\Tools\\": "dev/tools/Magento/Tools/",
+            "Magento\\Tools\\Sanity\\": "dev/build/publication/sanity/Magento/Tools/Sanity/",
+            "Magento\\TestFramework\\Inspection\\": "dev/tests/static/framework/Magento/TestFramework/Inspection/",
+            "Magento\\TestFramework\\Utility\\": "dev/tests/static/framework/Magento/TestFramework/Utility/",
+            "Magento\\PhpStan\\": "dev/tests/static/framework/Magento/PhpStan/"
+        }
+    },
+    "minimum-stability": "stable",
+    "repositories": {
+        "0": {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        },
+        "swissup": {
+            "type": "composer",
+            "url": "https://docs.swissuplabs.com/packages/"
+        }
+    },
+    "extra": {
+        "magento-force": "override"
+    }
+}

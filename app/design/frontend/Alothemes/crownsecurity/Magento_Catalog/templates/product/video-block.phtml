@@ -1,0 +1,110 @@
+<?php
+/**
+ * @var $block \FME\Productvideos\Block\Productvideos
+ * @var $helper \FME\Productvideos\Helper\Data
+ */
+?>
+<?php
+$helper = $this->helper('FME\Productvideos\Helper\Data');
+$product_videos = $block->getProductVideos();
+?>
+<ul class="product-video-thumbs">
+    <?php if ($product_videos->count()): ?>
+        <li class="video-title"
+            style="float: left; list-style: none; position: relative; margin-right: 12px; width: 96px;">
+            <p><?php echo $block->escapeHtml(__('VIDEO:')); ?></p>
+        </li>
+        <?php foreach ($product_videos as $_item): ?>
+            <?php if ($_item['status'] == 1 && $_item['video_type'] == "url"): ?>
+                <?php
+                $_imageThums = $helper->getImgUrl($_item['video_thumb']);
+                ?>
+                <li style="float: left; list-style: none; position: relative; margin-right: 12px; width: 96px;">
+                    <a data-modal="#popup-modal-<?php echo $_item['video_id'] ?>"
+                       id="click-video-<?php echo $_item['video_id'] ?>" class="thumb-video-bg"
+                       href="javascript:void(0)">
+                        <?php if ($_item['video_thumb'] && $_item['video_thumb'] != ''): ?>
+                            <img class="video-thumb-bg" src="<?= $_imageThums ?>" alt="">
+                            <img class="video-thumb-icon" src="<?=
+                            /* @noEscape */
+                            $block->getViewFileUrl('images/youtube.png'); ?>" alt="">
+                        <?php else: ?>
+                            <img src="<?=
+                            /* @noEscape */
+                            $block->getViewFileUrl('images/youtube.png'); ?>" alt="">
+                        <?php endif ?>
+                    </a>
+                </li>
+                <div id="popup-modal-<?php echo $_item['video_id'] ?>" style="display:none;">
+                    <div class="video-popup">
+                        <div class="video-wrapper">
+                            <iframe id="videoplayer" width="600" height="500" src="<?= $_item['video_url'] ?>"
+                                    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            <?php elseif ($_item['status'] == 1 && $_item['video_type'] == "file"): ?>
+                <li style="float: left; list-style: none; position: relative; margin-right: 12px; width: 96px;">
+                    <a id="click-video" class="thumb-link" href="#">
+                        <img src="<?= $_imageThums = $helper->getImgUrl($_item['video_thumb']); ?>" alt="">
+                    </a>
+                </li>
+                <div id="popup-modal" style="display:none;">
+                    <div class="video-popup">
+                        <div class="video-wrapper">
+                            <?php $img_url = $helper->getImgUrl($_item['video_thumb']); ?>
+                            <video id="videoplayer" controls poster='<?php echo $img_url ?>' width="600"
+                                   height="500">
+                                <source src='<?php echo $helper->getMediaUrl() . $_item['video_file']; ?>'
+                                        type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</ul>
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function (
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: false,
+                innerScroll: true,
+                title: false,
+                loading: true,
+                buttons: false,
+                modalClass: 'video-modal',
+                closed: function (e) {
+                    stopVideo();
+                }
+            };
+
+            $(".thumb-video-bg").on('click', function () {
+                var modalData = $(this).attr('data-modal');
+                var popup = modal(options, $(modalData));
+                $(modalData).modal("openModal");
+            });
+
+            function stopVideo() {
+                var videos = document.querySelectorAll('iframe, video');
+                Array.prototype.forEach.call(videos, function (video) {
+                    if (video.tagName.toLowerCase() === 'video') {
+                        video.pause();
+                    } else {
+                        var src = video.src;
+                        video.src = src;
+                    }
+                });
+            }
+        }
+    );
+</script>

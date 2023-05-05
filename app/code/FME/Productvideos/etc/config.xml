@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+/*////////////////////////////////////////////////////////////////////////////////
+ \\\\\\\\\\\\\\\\\\\\\\\\\  FME Productvideos Module  \\\\\\\\\\\\\\\\\\\\\\\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ \\\\\\\\\\\\\\\\\\\\\\\\\ NOTICE OF LICENSE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ ///////                                                                   ///////
+ \\\\\\\ This source file is subject to the Open Software License (OSL 3.0)\\\\\\\
+ ///////   that is bundled with this package in the file LICENSE.txt.      ///////
+ \\\\\\\   It is also available through the world-wide-web at this URL:    \\\\\\\
+ ///////          http://opensource.org/licenses/osl-3.0.php               ///////
+ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ ///////                      * @category   FME                            ///////
+ \\\\\\\                      * @package    FME_Productvideos              \\\\\\\
+ ///////    * @author    FME Extensions <support@fmeextensions.com>   ///////
+ \\\\\\\                                                                   \\\\\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ \\* @copyright  Copyright 2015 © fmeextensions.com All right reserved\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <productvideos>
+            <general>
+                <enable_module>1</enable_module>
+                <title>Product Videos</title>
+            </general>
+            <compactview>
+                <view>gridr</view>
+            </compactview>
+            <thumbsetting>
+                <thumb_width>100</thumb_width>
+                <thumb_height>100</thumb_height>
+                <thumb_border_effect>1</thumb_border_effect>
+                <thumb_border_width>5</thumb_border_width>
+                <thumb_border_color>#000000</thumb_border_color>
+                <thumb_over_border_width>5</thumb_over_border_width>
+                <thumb_over_border_color>#4d0b08</thumb_over_border_color>
+                <thumb_selected_border_width>5</thumb_selected_border_width>
+                <thumb_selected_border_color>#fc0505</thumb_selected_border_color>
+                <thumb_round_corners_radius>70</thumb_round_corners_radius>
+                <thumb_color_overlay_effect>1</thumb_color_overlay_effect>
+                <thumb_overlay_color>#f2fa00</thumb_overlay_color>
+                <thumb_overlay_opacity>0.4</thumb_overlay_opacity>
+                <thumb_overlay_reverse>1</thumb_overlay_reverse>
+                <thumb_image_overlay_effect>0</thumb_image_overlay_effect>
+                <thumb_image_overlay_type>sepia</thumb_image_overlay_type>
+                <thumb_transition_duration>200</thumb_transition_duration>
+               
+            </thumbsetting>
+            <stripepaneloptions>
+                <strippanel_padding_top>10</strippanel_padding_top>
+                <strippanel_padding_bottom>10</strippanel_padding_bottom>
+                <strippanel_padding_left>10</strippanel_padding_left>
+                <strippanel_padding_right>10</strippanel_padding_right>
+                <strippanel_background_color>#06324a</strippanel_background_color>
+                <strip_thumbs_align>top</strip_thumbs_align>
+                <strip_space_between_thumbs>20</strip_space_between_thumbs>
+                <strip_scroll_to_thumb_duration>1000</strip_scroll_to_thumb_duration>
+            </stripepaneloptions>
+            <gridpaneloptions>
+                <gridpanel_vertical_scroll>1</gridpanel_vertical_scroll>
+                <gridpanel_grid_align>left</gridpanel_grid_align>
+                <gridpanel_background_color>#063961</gridpanel_background_color>
+                <grid_num_cols>2</grid_num_cols>
+                <grid_space_between_cols>10</grid_space_between_cols>
+                <grid_space_between_rows>10</grid_space_between_rows>
+                <grid_transition_duration>1000</grid_transition_duration>
+                <grid_carousel>1</grid_carousel>
+            </gridpaneloptions>
+            <slideoptions>
+                <slider_transition>fade</slider_transition>
+                <slider_transition_speed>1000</slider_transition_speed>
+                <slider_control_swipe>1</slider_control_swipe>
+                
+                <slider_enable_bullets1>1</slider_enable_bullets1>
+                <slider_bullets_align_hor>center</slider_bullets_align_hor>
+                <slider_bullets_align_vert>top</slider_bullets_align_vert>
+                <slider_enable_arrows>1</slider_enable_arrows>
+                <slider_enable_progress_indicator>1</slider_enable_progress_indicator>
+                <slider_progress_indicator_type>pie2</slider_progress_indicator_type>
+                <slider_progress_indicator_align_vert>middle</slider_progress_indicator_align_vert>
+                <slider_progressbar_color>#0e8f28</slider_progressbar_color>
+                <slider_progressbar_opacity>0.4</slider_progressbar_opacity>
+                <slider_progressbar_line_width>5</slider_progressbar_line_width>
+                <slider_progresspie_type_fill>1</slider_progresspie_type_fill>
+                <slider_progresspie_color1>#d62000</slider_progresspie_color1>
+                <slider_progresspie_color2>#0e5912</slider_progresspie_color2>
+                <slider_progresspie_stroke_width>1000</slider_progresspie_stroke_width>
+                <slider_progresspie_width>50</slider_progresspie_width>
+                <slider_progresspie_height>50</slider_progresspie_height>
+                <slider_enable_play_button>1</slider_enable_play_button>
+                <slider_play_button_align_hor>left</slider_play_button_align_hor>
+                <slider_play_button_align_vert>top</slider_play_button_align_vert>
+                <slider_enable_fullscreen_button>1</slider_enable_fullscreen_button>
+                <slider_fullscreen_button_align_hor>left</slider_fullscreen_button_align_hor>
+                <slider_fullscreen_button_align_vert>top</slider_fullscreen_button_align_vert>
+                <slider_controls_always_on>0</slider_controls_always_on>
+                <slider_controls_appear_duration>1000</slider_controls_appear_duration>
+                <slider_enable_text_panel>0</slider_enable_text_panel>
+                <slider_textpanel_bg_color>#66082e</slider_textpanel_bg_color>
+                <slider_textpanel_bg_opacity>0.4</slider_textpanel_bg_opacity>
+            
+            </slideoptions>
+        </productvideos>
+        
+    </default>
+</config>

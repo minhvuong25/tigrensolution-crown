@@ -1,0 +1,90 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Magento\Catalog\Block\Category\View
+ */
+?>
+<?php
+$_helper    = $this->helper('Magento\Catalog\Helper\Output');
+$_category  = $block->getCurrentCategory();
+$_videoUrl      = $_category->getData('tigren_category_video');
+$_imgHtml   = '';
+if ($_imgUrl = $_category->getImageUrl()) {
+    $_imgHtml = '<div class="category-image box-layout"><img src="' . $_imgUrl . '" alt="' . $block->escapeHtml($_category->getName()) . '" title="' . $block->escapeHtml($_category->getName()) . '" class="image" /></div>';
+    $_imgHtml = $_helper->categoryAttribute($_category, $_imgHtml, 'image');
+    /* @escapeNotVerified */ echo $_imgHtml;
+}
+?>
+<?php if (!empty($_videoUrl)) { ?>
+    <div id="popup-modal" style="display:none;">
+        <div class="video-popup">
+            <div class="video-wrapper">
+                <iframe width="600" height="500" src="<?= $_videoUrl ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="video-banner-container row">
+        <a id="click-text" class="col-xs-8 video-banner-text" href="#">Want to see it in action? Watch our video</a>
+        <div class="col-xs-4 video-banner-icon">
+            <a id="click-video" href="#">
+                <i class="fa fa-caret-right video-open"></i>
+            </a>
+        </div>
+    </div>
+<?php } ?>
+
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function(
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: false,
+                innerScroll: true,
+                title: false,
+                buttons: false,
+                modalClass: 'video-modal',
+                closed: function (e) {
+                    stopVideo();
+                }
+            };
+
+            var popup = modal(options, $('#popup-modal'));
+            $("#click-video").on('click',function(){
+                $("#popup-modal").modal("openModal");
+            });
+
+            $("#click-text").on('click',function(){
+                $("#popup-modal").modal("openModal");
+            });
+
+            function stopVideo() {
+                var videos = document.querySelectorAll('iframe, video');
+                Array.prototype.forEach.call(videos, function (video) {
+                    if (video.tagName.toLowerCase() === 'video') {
+                        video.pause();
+                    } else {
+                        var src = video.src;
+                        video.src = src;
+                    }
+                });
+            }
+        }
+    );
+</script>
