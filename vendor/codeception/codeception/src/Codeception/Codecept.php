@@ -1,156 +1,210 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception;
 
-use Codeception\Event\DispatcherWrapper;
+use Codeception\Coverage\Subscriber\Local;
+use Codeception\Coverage\Subscriber\LocalServer;
+use Codeception\Coverage\Subscriber\Printer as CoveragePrinter;
+use Codeception\Coverage\Subscriber\RemoteServer;
+use Codeception\Event\PrintResultEvent;
 use Codeception\Exception\ConfigurationException;
+use Codeception\Lib\Console\Output;
+use Codeception\Lib\Interfaces\ConsolePrinter;
+use Codeception\Lib\Notification;
+use Codeception\Reporter\HtmlReporter;
+use Codeception\Reporter\JUnitReporter;
+use Codeception\Reporter\PhpUnitReporter;
+use Codeception\Reporter\ReportPrinter;
+use Codeception\Subscriber\AutoRebuild;
+use Codeception\Subscriber\BeforeAfterTest;
+use Codeception\Subscriber\Bootstrap;
+use Codeception\Subscriber\Console;
+use Codeception\Subscriber\Dependencies;
+use Codeception\Subscriber\Deprecation;
+use Codeception\Subscriber\ErrorHandler;
 use Codeception\Subscriber\ExtensionLoader;
+use Codeception\Subscriber\FailFast;
+use Codeception\Subscriber\GracefulTermination;
+use Codeception\Subscriber\Module;
+use Codeception\Subscriber\PrepareTest;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Codecept
 {
-    use DispatcherWrapper;
-
-    const VERSION = '4.2.2';
-
     /**
-     * @var \Codeception\PHPUnit\Runner
+     * @var string
      */
-    protected $runner;
-    /**
-     * @var \PHPUnit\Framework\TestResult
-     */
-    protected $result;
+    public const VERSION = '5.0.10';
 
-    /**
-     * @var \Codeception\CodeCoverage
-     */
-    protected $coverage;
+    protected ResultAggregator $resultAggregator;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
-     */
-    protected $dispatcher;
+    protected EventDispatcher $dispatcher;
 
-    /**
-     * @var ExtensionLoader
-     */
-    protected $extensionLoader;
+    protected ExtensionLoader $extensionLoader;
 
-    /**
-     * @var array
-     */
-    protected $options = [
-        'silent'          => false,
-        'debug'           => false,
-        'steps'           => false,
-        'html'            => false,
-        'xml'             => false,
-        'phpunit-xml'     => false,
-        'no-redirect'     => true,
-        'json'            => false,
-        'tap'             => false,
-        'report'          => false,
-        'colors'          => false,
-        'coverage'        => false,
-        'coverage-xml'    => false,
-        'coverage-html'   => false,
-        'coverage-text'   => false,
-        'coverage-crap4j' => false,
+    protected array $options = [
+        'silent'             => false,
+        'debug'              => false,
+        'steps'              => false,
+        'html'               => false,
+        'xml'                => false,
+        'phpunit-xml'        => false,
+        'no-redirect'        => true,
+        'report'             => false,
+        'colors'             => false,
+        'coverage'           => false,
+        'coverage-xml'       => false,
+        'coverage-html'      => false,
+        'coverage-text'      => false,
+        'coverage-crap4j'    => false,
         'coverage-cobertura' => false,
-        'coverage-phpunit'=> false,
-        'groups'          => null,
-        'excludeGroups'   => null,
-        'filter'          => null,
-        'env'             => null,
-        'fail-fast'       => false,
-        'ansi'            => true,
-        'verbosity'       => 1,
-        'interactive'     => true,
-        'no-rebuild'      => false,
-        'quiet'           => false,
+        'coverage-phpunit'   => false,
+        'groups'             => null,
+        'excludeGroups'      => null,
+        'filter'             => null,
+        'shard'              => null,
+        'env'                => null,
+        'fail-fast'          => 0,
+        'ansi'               => true,
+        'verbosity'          => 1,
+        'interactive'        => true,
+        'no-rebuild'         => false,
+        'quiet'              => false,
     ];
 
-    protected $config = [];
+    protected array $config = [];
 
-    /**
-     * @var array
-     */
-    protected $extensions = [];
+    protected array $extensions = [];
 
-    public function __construct($options = [])
+    private Output $output;
+
+    public function __construct(array $options = [])
     {
-        $this->result = new \PHPUnit\Framework\TestResult;
+        $this->resultAggregator = new ResultAggregator();
         $this->dispatcher = new EventDispatcher();
         $this->extensionLoader = new ExtensionLoader($this->dispatcher);
 
         $baseOptions = $this->mergeOptions($options);
         $this->extensionLoader->bootGlobalExtensions($baseOptions); // extensions may override config
 
-        $this->config = Configuration::config();
+        $this->config  = Configuration::config();
         $this->options = $this->mergeOptions($options); // options updated from config
 
+        $this->output = new Output($this->options);
+
         $this->registerSubscribers();
-        $this->registerPHPUnitListeners();
-        $this->registerPrinter();
     }
 
     /**
      * Merges given options with default values and current configuration
      *
-     * @param array $options options
-     * @return array
      * @throws ConfigurationException
      */
-    protected function mergeOptions($options)
+    protected function mergeOptions(array $options): array
     {
-        $config = Configuration::config();
+        $config      = Configuration::config();
         $baseOptions = array_merge($this->options, $config['settings']);
         return array_merge($baseOptions, $options);
     }
 
-    protected function registerPHPUnitListeners()
-    {
-        $listener = new PHPUnit\Listener($this->dispatcher);
-        $this->result->addListener($listener);
-    }
-
-    public function registerSubscribers()
+    public function registerSubscribers(): void
     {
         // required
-        $this->dispatcher->addSubscriber(new Subscriber\GracefulTermination());
-        $this->dispatcher->addSubscriber(new Subscriber\ErrorHandler());
-        $this->dispatcher->addSubscriber(new Subscriber\Dependencies());
-        $this->dispatcher->addSubscriber(new Subscriber\Bootstrap());
-        $this->dispatcher->addSubscriber(new Subscriber\PrepareTest());
-        $this->dispatcher->addSubscriber(new Subscriber\Module());
-        $this->dispatcher->addSubscriber(new Subscriber\BeforeAfterTest());
+        $this->dispatcher->addSubscriber(new GracefulTermination($this->resultAggregator));
+        $this->dispatcher->addSubscriber(new ErrorHandler());
+        $this->dispatcher->addSubscriber(new Dependencies());
+        $this->dispatcher->addSubscriber(new Bootstrap());
+        $this->dispatcher->addSubscriber(new PrepareTest());
+        $this->dispatcher->addSubscriber(new Module());
+        $this->dispatcher->addSubscriber(new BeforeAfterTest());
 
         // optional
         if (!$this->options['no-rebuild']) {
-            $this->dispatcher->addSubscriber(new Subscriber\AutoRebuild());
+            $this->dispatcher->addSubscriber(new AutoRebuild());
         }
-        if (!$this->options['silent']) {
-            $this->dispatcher->addSubscriber(new Subscriber\Console($this->options));
-        }
-        if ($this->options['fail-fast']) {
-            $this->dispatcher->addSubscriber(new Subscriber\FailFast());
+
+        if ($this->options['fail-fast'] > 0) {
+            $this->dispatcher->addSubscriber(new FailFast($this->options['fail-fast'], $this->resultAggregator));
         }
 
         if ($this->options['coverage']) {
-            $this->dispatcher->addSubscriber(new Coverage\Subscriber\Local($this->options));
-            $this->dispatcher->addSubscriber(new Coverage\Subscriber\LocalServer($this->options));
-            $this->dispatcher->addSubscriber(new Coverage\Subscriber\RemoteServer($this->options));
-            $this->dispatcher->addSubscriber(new Coverage\Subscriber\Printer($this->options));
+            $this->dispatcher->addSubscriber(new Local($this->options));
+            $this->dispatcher->addSubscriber(new LocalServer($this->options));
+            $this->dispatcher->addSubscriber(new RemoteServer($this->options));
+            $this->dispatcher->addSubscriber(new CoveragePrinter($this->options, $this->output));
         }
+
+        if ($this->options['report']) {
+            $this->dispatcher->addSubscriber(new ReportPrinter($this->options));
+        }
+
         $this->dispatcher->addSubscriber($this->extensionLoader);
         $this->extensionLoader->registerGlobalExtensions();
+
+        if (!$this->options['silent'] && !$this->isConsolePrinterSubscribed()) {
+            $this->dispatcher->addSubscriber(new Console($this->options));
+        }
+
+        $this->dispatcher->addSubscriber(new Deprecation($this->options));
+
+        $this->registerReporters();
     }
 
-    public function run($suite, $test = null, array $config = null)
+    private function isConsolePrinterSubscribed(): bool
+    {
+        foreach ($this->dispatcher->getListeners() as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if ($listener instanceof ConsolePrinter) {
+                    return true;
+                }
+                if (is_array($listener) && $listener[0] instanceof ConsolePrinter) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function registerReporters(): void
+    {
+        if (isset($this->config['reporters'])) {
+            Notification::warning(
+                "'reporters' option is not supported! Custom reporters must be reimplemented as extensions.",
+                ''
+            );
+        }
+        if ($this->options['html']) {
+            $this->dispatcher->addSubscriber(
+                new HtmlReporter($this->options, $this->output)
+            );
+        }
+        if ($this->options['xml']) {
+            $this->dispatcher->addSubscriber(
+                new JUnitReporter($this->options, $this->output)
+            );
+        }
+        if ($this->options['phpunit-xml']) {
+            $this->dispatcher->addSubscriber(
+                new PhpUnitReporter($this->options, $this->output)
+            );
+        }
+    }
+
+    private function absolutePath(string $path): string
+    {
+        if ((str_starts_with($path, '/')) or (strpos($path, ':') === 1)) { // absolute path
+            return $path;
+        }
+        return Configuration::outputDir() . $path;
+    }
+
+    public function run(string $suite, string $test = null, array $config = null): void
     {
         ini_set(
             'memory_limit',
-            isset($this->config['settings']['memory_limit']) ? $this->config['settings']['memory_limit'] : '1024M'
+            $this->config['settings']['memory_limit'] ?? '1024M'
         );
 
         $config = $config ?: Configuration::config();
@@ -165,31 +219,28 @@ class Codecept
 
         // Iterate over all unique environment sets and runs the given suite with each of the merged configurations.
         foreach (array_unique($selectedEnvironments) as $envList) {
-            $envSet = explode(',', $envList);
+            $envSet         = explode(',', $envList);
             $suiteEnvConfig = $config;
 
             // contains a list of the environments used in this suite configuration env set.
             $envConfigs = [];
             foreach ($envSet as $currentEnv) {
-                if (isset($config['env'])) {
-                    // The $settings['env'] actually contains all parsed configuration files as a
-                    // filename => filecontents key-value array. If there is no configuration file for the
-                    // $currentEnv the merge will be skipped.
-                    if (!array_key_exists($currentEnv, $config['env'])) {
-                        return;
-                    }
-
-                    // Merge configuration consecutively with already build configuration
-                    $suiteEnvConfig = Configuration::mergeConfigs($suiteEnvConfig, $config['env'][$currentEnv]);
-                    $envConfigs[] = $currentEnv;
+                // The $settings['env'] actually contains all parsed configuration files as a
+                // filename => filecontents key-value array. If there is no configuration file for the
+                // $currentEnv the merge will be skipped.
+                if (!array_key_exists($currentEnv, $config['env'])) {
+                    return;
                 }
+
+                // Merge configuration consecutively with already build configuration
+                if (is_array($config['env'][$currentEnv])) {
+                    $suiteEnvConfig = Configuration::mergeConfigs($suiteEnvConfig, $config['env'][$currentEnv]);
+                }
+                $envConfigs[]   = $currentEnv;
             }
 
             $suiteEnvConfig['current_environment'] = implode(',', $envConfigs);
 
-            if (empty($suiteEnvConfig)) {
-                continue;
-            }
             $suiteToRun = $suite;
             if (!empty($envList)) {
                 $suiteToRun .= ' (' . implode(', ', $envSet) . ')';
@@ -198,58 +249,39 @@ class Codecept
         }
     }
 
-    public function runSuite($settings, $suite, $test = null)
+    public function runSuite(array $settings, string $suite, string $test = null): void
     {
-        $suiteManager = new SuiteManager($this->dispatcher, $suite, $settings);
+        $settings['shard'] = $this->options['shard'];
+        $suiteManager = new SuiteManager($this->dispatcher, $suite, $settings, $this->options);
         $suiteManager->initialize();
         srand($this->options['seed']);
         $suiteManager->loadTests($test);
         srand();
-        $suiteManager->run($this->runner, $this->result, $this->options);
-        return $this->result;
+        $suiteManager->run($this->resultAggregator);
     }
 
-    public static function versionString()
+    public static function versionString(): string
     {
         return 'Codeception PHP Testing Framework v' . self::VERSION;
     }
 
-    public function printResult()
+    public function printResult(): void
     {
-        $result = $this->getResult();
-        $result->flushListeners();
-
-        $printer = $this->runner->getPrinter();
-        $printer->printResult($result);
-
-        $this->dispatch($this->dispatcher, Events::RESULT_PRINT_AFTER, new Event\PrintResultEvent($result, $printer));
+        $this->dispatcher->dispatch(new PrintResultEvent($this->resultAggregator), Events::RESULT_PRINT_AFTER);
     }
 
-    /**
-     * @return \PHPUnit\Framework\TestResult
-     */
-    public function getResult()
+    public function getResultAggregator(): ResultAggregator
     {
-        return $this->result;
+        return $this->resultAggregator;
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @return EventDispatcher
-     */
-    public function getDispatcher()
+    public function getDispatcher(): EventDispatcher
     {
         return $this->dispatcher;
-    }
-
-    protected function registerPrinter()
-    {
-        $printer = new PHPUnit\ResultPrinter\UI($this->dispatcher, $this->options);
-        $this->runner = new PHPUnit\Runner();
-        $this->runner->setPrinter($printer);
     }
 }

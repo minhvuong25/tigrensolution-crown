@@ -1,7 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Module;
 
-use Codeception\Module as CodeceptionModule;
+use Codeception\Module;
 use Codeception\Exception\ModuleException;
 use Codeception\TestInterface;
 
@@ -46,7 +49,6 @@ use Codeception\TestInterface;
  * for ($i = 0; $i<10; $i++) {
  *      $I->haveInDatabase('users', array('login' => sq("user$i"), 'email' => sq("user$i").'@email.com');
  * }
- * ?>
  * ```
  *
  * Cest Suite tests:
@@ -70,7 +72,6 @@ use Codeception\TestInterface;
  *         $I->removeUser(sqs('user') . '@mailserver.com');
  *     }
  * }
- * ?>
  * ```
  *
  * ### Config
@@ -97,32 +98,37 @@ use Codeception\TestInterface;
  *     prefix: '{id}.'
  * ```
  */
-class Sequence extends CodeceptionModule
+class Sequence extends Module
 {
-    public static $hash = [];
-    public static $suiteHash = [];
-    public static $prefix = '';
+    /**
+     * @var array<int|string,string>
+     */
+    public static array $hash = [];
 
-    protected $config = ['prefix' => '{id}_'];
+    /**
+     * @var array<int|string,string>
+     */
+    public static array $suiteHash = [];
 
-    public function _initialize()
+    public static string $prefix = '';
+
+    /**
+     * @var array<string, string>
+     */
+    protected array $config = ['prefix' => '{id}_'];
+
+    public function _initialize(): void
     {
         static::$prefix = $this->config['prefix'];
     }
 
-    public function _after(TestInterface $t)
+    public function _after(TestInterface $test): void
     {
         self::$hash = [];
     }
 
-    public function _afterSuite()
+    public function _afterSuite(): void
     {
         self::$suiteHash = [];
     }
-}
-
-if (!function_exists('sq') && !function_exists('sqs')) {
-    require_once __DIR__ . '/../Util/sq.php';
-} else {
-    throw new ModuleException('Codeception\Module\Sequence', "function 'sq' and 'sqs' already defined");
 }

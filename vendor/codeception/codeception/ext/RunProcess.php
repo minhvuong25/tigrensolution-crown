@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Codeception\Extension;
 
 use Codeception\Events;
 use Codeception\Exception\ExtensionException;
 use Codeception\Extension;
 use Symfony\Component\Process\Process;
+
+use function array_reverse;
+use function class_exists;
+use function is_int;
+use function sleep;
 
 /**
  * Extension to start and stop processes per suite.
@@ -51,23 +58,32 @@ use Symfony\Component\Process\Process;
  */
 class RunProcess extends Extension
 {
-    protected $config = ['sleep' => 0];
+    /**
+     * @var array<int|string, mixed>
+     */
+    protected array $config = ['sleep' => 0];
 
-    protected static $events = [
+    /**
+     * @var array<string, string>
+     */
+    protected static array $events = [
         Events::SUITE_BEFORE => 'runProcess',
         Events::SUITE_AFTER => 'stopProcess'
     ];
 
-    private $processes = [];
+    /**
+     * @var Process[]
+     */
+    private array $processes = [];
 
-    public function _initialize()
+    public function _initialize(): void
     {
-        if (!class_exists('Symfony\Component\Process\Process')) {
+        if (!class_exists(Process::class)) {
             throw new ExtensionException($this, 'symfony/process package is required');
         }
     }
 
-    public function runProcess()
+    public function runProcess(): void
     {
         $this->processes = [];
         foreach ($this->config as $key => $command) {
@@ -77,15 +93,10 @@ class RunProcess extends Extension
             if (!is_int($key)) {
                 continue; // configuration options
             }
-            if (method_exists(Process::class, 'fromShellCommandline')) {
-                //Symfony 4.2+
-                $process = Process::fromShellCommandline($command, $this->getRootDir(), null, null, null);
-            } else {
-                $process = new Process($command, $this->getRootDir(), null, null, null);
-            }
+            $process = Process::fromShellCommandline($command, $this->getRootDir(), null, null, null);
             $process->start();
             $this->processes[] = $process;
-            $this->output->debug('[RunProcess] Starting '.$command);
+            $this->output->debug('[RunProcess] Starting ' . $command);
         }
         sleep($this->config['sleep']);
     }
@@ -95,10 +106,10 @@ class RunProcess extends Extension
         $this->stopProcess();
     }
 
-    public function stopProcess()
+    public function stopProcess(): void
     {
         foreach (array_reverse($this->processes) as $process) {
-            /** @var $process Process  **/
+            /** @var Process $process */
             if (!$process->isRunning()) {
                 continue;
             }

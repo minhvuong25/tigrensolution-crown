@@ -1,36 +1,35 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Util;
+
+use function array_key_exists;
+use function explode;
+use function is_array;
+use function preg_match_all;
+use function sprintf;
+use function str_replace;
 
 /**
  * Basic template engine used for generating initial Cept/Cest/Test files.
  */
 class Template
 {
-    protected $template;
-    protected $vars = [];
-    protected $placeholderStart;
-    protected $placeholderEnd;
+    private array $vars = [];
 
-    /**
-     * Takes a template string
-     *
-     * @param $template
-     */
-    public function __construct($template, $placeholderStart = '{{', $placeholderEnd = '}}')
-    {
-        $this->template         = $template;
-        $this->placeholderStart = $placeholderStart;
-        $this->placeholderEnd   = $placeholderEnd;
+    public function __construct(
+        private string $template,
+        private string $placeholderStart = '{{',
+        private string $placeholderEnd = '}}',
+        private ?string $encoderFunction = null,
+    ) {
     }
 
     /**
      * Replaces {{var}} string with provided value
-     *
-     * @param $var
-     * @param $val
-     * @return $this
      */
-    public function place($var, $val)
+    public function place(string $var, $val): self
     {
         $this->vars[$var] = $val;
         return $this;
@@ -38,27 +37,24 @@ class Template
 
     /**
      * Sets all template vars
-     *
-     * @param array $vars
      */
-    public function setVars(array $vars)
+    public function setVars(array $vars): void
     {
         $this->vars = $vars;
     }
 
-    public function getVar($name)
+    public function getVar(string $name)
     {
         if (isset($this->vars[$name])) {
             return $this->vars[$name];
         }
+        return null;
     }
 
     /**
      * Fills up template string with placed variables.
-     *
-     * @return mixed
      */
-    public function produce()
+    public function produce(): string
     {
         $result = $this->template;
         $regex = sprintf('~%s([\w\.]+)%s~m', $this->placeholderStart, $this->placeholderEnd);
@@ -71,12 +67,19 @@ class Template
         foreach ($matches as $match) { // fill in placeholders
             $placeholder = $match[1];
             $value = $this->vars;
-            foreach (explode('.', $placeholder) as $segment) {
+
+            foreach (explode('.', trim($placeholder, '\'"')) as $segment) {
                 if (is_array($value) && array_key_exists($segment, $value)) {
                     $value = $value[$segment];
                 } else {
                     continue 2;
                 }
+            }
+
+            if ($this->encoderFunction !== null) {
+                $value = ($this->encoderFunction)($value);
+            } elseif (!is_string($value)) {
+                $value = (string)$value;
             }
 
             $result = str_replace($this->placeholderStart . $placeholder . $this->placeholderEnd, $value, $result);

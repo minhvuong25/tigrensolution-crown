@@ -1,5 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Util;
+
+use ArrayAccess;
+use Iterator;
+use JsonSerializable;
+
+use function array_keys;
+use function call_user_func_array;
+use function count;
+use function is_array;
+use function is_object;
+use function property_exists;
+use function range;
 
 /**
  * Class to represent any type of content.
@@ -15,16 +30,17 @@ namespace Codeception\Util;
  * <?php
  * $user = new Maybe;
  * $user->posts->comments->count();
- * ?>
  * ```
  */
-class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
+class Maybe implements ArrayAccess, Iterator, JsonSerializable
 {
-    protected $position = 0;
-    protected $val = null;
-    protected $assocArray = null;
+    protected int $position = 0;
 
-    public function __construct($val = null)
+    protected mixed $val = null;
+
+    protected ?bool $assocArray = null;
+
+    public function __construct(mixed $val = null)
     {
         $this->val = $val;
         if (is_array($this->val)) {
@@ -33,43 +49,34 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
         $this->position = 0;
     }
 
-    private function isAssocArray($arr)
+    private function isAssocArray(array $arr): bool
     {
         return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->val === null) {
-            return "?";
-        }
-        if (is_scalar($this->val)) {
-            return (string)$this->val;
+            return '?';
         }
 
-        if (is_object($this->val) && method_exists($this->val, '__toString')) {
-            return $this->val->__toString();
-        }
-
-        return $this->val;
+        return (string)$this->val;
     }
 
-    public function __get($key)
+    public function __get(string $key): Maybe
     {
         if ($this->val === null) {
             return new Maybe();
         }
 
-        if (is_object($this->val)) {
-            if (isset($this->val->{$key}) || property_exists($this->val, $key)) {
-                return $this->val->{$key};
-            }
+        if (is_object($this->val) && (isset($this->val->{$key}) || property_exists($this->val, $key))) {
+            return $this->val->{$key};
         }
 
         return $this->val->key;
     }
 
-    public function __set($key, $val)
+    public function __set(string $key, $val)
     {
         if ($this->val === null) {
             return;
@@ -83,7 +90,7 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
         $this->val->key = $val;
     }
 
-    public function __call($method, $args)
+    public function __call(string $method, array $args)
     {
         if ($this->val === null) {
             return new Maybe();
@@ -98,53 +105,50 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
         }
     }
 
-    public function __unset($key)
+    public function __unset(string $key)
     {
-        if (is_object($this->val)) {
-            if (isset($this->val->{$key}) || property_exists($this->val, $key)) {
-                unset($this->val->{$key});
-                return;
-            }
+        if (is_object($this->val) && (isset($this->val->{$key}) || property_exists($this->val, $key))) {
+            unset($this->val->{$key});
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
-        if (is_array($this->val) || ($this->val instanceof \ArrayAccess)) {
+        if (is_array($this->val) || ($this->val instanceof ArrayAccess)) {
             return isset($this->val[$offset]);
         }
         return false;
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): Maybe
     {
-        if (is_array($this->val) || ($this->val instanceof \ArrayAccess)) {
+        if (is_array($this->val) || $this->val instanceof ArrayAccess) {
             return $this->val[$offset];
         }
         return new Maybe();
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        if (is_array($this->val) || ($this->val instanceof \ArrayAccess)) {
+        if (is_array($this->val) || ($this->val instanceof ArrayAccess)) {
             $this->val[$offset] = $value;
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
-        if (is_array($this->val) || ($this->val instanceof \ArrayAccess)) {
+        if (is_array($this->val) || ($this->val instanceof ArrayAccess)) {
             unset($this->val[$offset]);
         }
     }
 
-    public function __value()
+    public function value()
     {
         $val = $this->val;
         if (is_array($val)) {
             foreach ($val as $k => $v) {
                 if ($v instanceof self) {
-                    $v = $v->__value();
+                    $v = $v->value();
                 }
                 $val[$k] = $v;
             }
@@ -153,12 +157,11 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      * @link https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      */
-    public function current()
+    public function current(): mixed
     {
         if (!is_array($this->val)) {
             return null;
@@ -172,23 +175,21 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Move forward to next element
      * @link https://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the key of the current element
      * @link https://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @return int|string|null scalar on success, or null on failure.
      */
-    public function key()
+    public function key(): mixed
     {
         if ($this->assocArray) {
             $keys = array_keys($this->val);
@@ -199,16 +200,15 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Checks if current position is valid
      * @link https://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
+     * @return bool The return value will be casted to boolean and then evaluated.
      * Returns true on success or false on failure.
      */
-    public function valid()
+    public function valid(): bool
     {
         if (!is_array($this->val)) {
-            return null;
+            return false;
         }
         if ($this->assocArray) {
             $keys = array_keys($this->val);
@@ -219,12 +219,11 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Rewind the Iterator to the first element
      * @link https://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      */
-    public function rewind()
+    public function rewind(): void
     {
         if (is_array($this->val)) {
             $this->assocArray = $this->isAssocArray($this->val);
@@ -233,13 +232,13 @@ class Maybe implements \ArrayAccess, \Iterator, \JsonSerializable
     }
 
     /**
-     * (PHP 5 >= 5.4.0)
-     * Serializes the object to a value that can be serialized natively by json_encode().
-     * @link https://docs.php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed Returns data which can be serialized by json_encode(), which is a value of any type other than a resource.
+     * Specify data which should be serialized to JSON
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by json_encode(),
+     * which is a value of any type other than a resource.
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
-        return $this->__value();
+        return $this->value();
     }
 }

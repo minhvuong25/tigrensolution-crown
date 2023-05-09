@@ -1,21 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Util;
+
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
+use function basename;
+use function rmdir;
+use function unlink;
 
 /**
  * Set of functions to work with Filesystem
- *
  */
 class FileSystem
 {
-    /**
-     * @param $path
-     */
-    public static function doEmptyDir($path)
+    public static function doEmptyDir(string $path): void
     {
-        /** @var $iterator \RecursiveIteratorIterator|\SplFileObject[] */
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path),
-            \RecursiveIteratorIterator::CHILD_FIRST
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path),
+            RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($iterator as $path) {
@@ -32,11 +37,7 @@ class FileSystem
         }
     }
 
-    /**
-     * @param $dir
-     * @return bool
-     */
-    public static function deleteDir($dir)
+    public static function deleteDir(string $dir): bool
     {
         if (!file_exists($dir)) {
             return true;
@@ -48,7 +49,7 @@ class FileSystem
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $dir = str_replace('/', '\\', $dir);
-            exec('rd /s /q "'.$dir.'"');
+            exec('rd /s /q "' . $dir . '"');
             return true;
         }
 
@@ -68,11 +69,7 @@ class FileSystem
         return @rmdir($dir);
     }
 
-    /**
-     * @param $src
-     * @param $dst
-     */
-    public static function copyDir($src, $dst)
+    public static function copyDir(string $src, string $dst): void
     {
         $dir = opendir($src);
         @mkdir($dst);

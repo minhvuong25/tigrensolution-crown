@@ -1,32 +1,36 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Command;
 
 use Codeception\Configuration;
-use Codeception\Event\DispatcherWrapper;
 use Codeception\Event\SuiteEvent;
 use Codeception\Event\TestEvent;
 use Codeception\Events;
 use Codeception\Lib\Generator\Actions;
 use Codeception\Lib\ModuleContainer;
-use Codeception\Module;
-use Codeception\Step;
 use Codeception\Stub;
 use Codeception\Subscriber\Bootstrap as BootstrapLoader;
 use Codeception\Subscriber\Console as ConsolePrinter;
 use Codeception\SuiteManager;
 use Codeception\Test\Interfaces\ScenarioDriven;
 use Codeception\Test\Test;
-use Codeception\Util\Maybe;
-use PHPUnit\Framework\MockObject\MockObject;
+use Exception;
+use InvalidArgumentException;
 use ReflectionIntersectionType;
 use ReflectionMethod;
-use ReflectionType;
+use ReflectionNamedType;
 use ReflectionUnionType;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use function ini_set;
+use function preg_match;
+use function str_replace;
 
 /**
  * Shows step by step execution process for scenario driven tests without actually running them.
@@ -39,11 +43,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class DryRun extends Command
 {
-    use DispatcherWrapper;
-    use Shared\Config;
-    use Shared\Style;
+    use Shared\ConfigTrait;
+    use Shared\StyleTrait;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDefinition(
             [
@@ -54,12 +57,12 @@ class DryRun extends Command
         parent::configure();
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Prints step-by-step scenario-driven test or a feature';
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->addStyles($output);
         $suite = $input->getArgument('suite');
@@ -68,67 +71,63 @@ class DryRun extends Command
         $config = $this->getGlobalConfig();
         ini_set(
             'memory_limit',
-            isset($config['settings']['memory_limit']) ? $config['settings']['memory_limit'] : '1024M'
+            $config['settings']['memory_limit'] ?? '1024M'
         );
-        if (! Configuration::isEmpty() && ! $test && strpos($suite, $config['paths']['tests']) === 0) {
-            list(, $suite, $test) = $this->matchTestFromFilename($suite, $config['paths']['tests']);
+        if (!Configuration::isEmpty() && !$test && str_starts_with($suite, (string)$config['paths']['tests'])) {
+            [, $suite, $test] = $this->matchTestFromFilename($suite, $config['paths']['tests']);
         }
         $settings = $this->getSuiteConfig($suite);
 
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new ConsolePrinter([
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new ConsolePrinter([
             'colors'    => (!$input->hasParameterOption('--no-ansi') xor $input->hasParameterOption('ansi')),
             'steps'     => true,
             'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
         ]));
-        $dispatcher->addSubscriber(new BootstrapLoader());
+        $eventDispatcher->addSubscriber(new BootstrapLoader());
 
-        $suiteManager = new SuiteManager($dispatcher, $suite, $settings);
+        $suiteManager = new SuiteManager($eventDispatcher, $suite, $settings, []);
         $moduleContainer = $suiteManager->getModuleContainer();
         foreach (Configuration::modules($settings) as $module) {
             $this->mockModule($module, $moduleContainer);
         }
         $suiteManager->loadTests($test);
-        $tests = $suiteManager->getSuite()->tests();
+        $tests = $suiteManager->getSuite()->getTests();
 
-        $this->dispatch($dispatcher, Events::SUITE_INIT, new SuiteEvent($suiteManager->getSuite(), null, $settings));
-        $this->dispatch($dispatcher, Events::SUITE_BEFORE, new SuiteEvent($suiteManager->getSuite(), null, $settings));
+        $eventDispatcher->dispatch(new SuiteEvent($suiteManager->getSuite(), $settings), Events::SUITE_INIT);
+        $eventDispatcher->dispatch(new SuiteEvent($suiteManager->getSuite(), $settings), Events::SUITE_BEFORE);
+
         foreach ($tests as $test) {
-            if ($test instanceof Test and $test instanceof ScenarioDriven) {
-                $this->dryRunTest($output, $dispatcher, $test);
+            if ($test instanceof Test && $test instanceof ScenarioDriven) {
+                $this->dryRunTest($output, $eventDispatcher, $test);
             }
         }
-        $this->dispatch($dispatcher, Events::SUITE_AFTER, new SuiteEvent($suiteManager->getSuite()));
+        $eventDispatcher->dispatch(new SuiteEvent($suiteManager->getSuite()), Events::SUITE_AFTER);
         return 0;
     }
 
-
-    protected function matchTestFromFilename($filename, $tests_path)
+    protected function matchTestFromFilename($filename, $testsPath)
     {
         $filename = str_replace(['//', '\/', '\\'], '/', $filename);
-        $res = preg_match("~^$tests_path/(.*?)/(.*)$~", $filename, $matches);
+        $res = preg_match("#^{$testsPath}/(.*?)/(.*)$#", $filename, $matches);
         if (!$res) {
-            throw new \InvalidArgumentException("Test file can't be matched");
+            throw new InvalidArgumentException("Test file can't be matched");
         }
 
         return $matches;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param $dispatcher
-     * @param $test
-     */
-    protected function dryRunTest(OutputInterface $output, EventDispatcher $dispatcher, Test $test)
+    protected function dryRunTest(OutputInterface $output, EventDispatcher $eventDispatcher, Test $test): void
     {
-        $this->dispatch($dispatcher, Events::TEST_START, new TestEvent($test));
-        $this->dispatch($dispatcher, Events::TEST_BEFORE, new TestEvent($test));
+        $eventDispatcher->dispatch(new TestEvent($test), Events::TEST_START);
+        $eventDispatcher->dispatch(new TestEvent($test), Events::TEST_BEFORE);
         try {
             $test->test();
-        } catch (\Exception $e) {
+        } catch (Exception) {
         }
-        $this->dispatch($dispatcher, Events::TEST_AFTER, new TestEvent($test));
-        $this->dispatch($dispatcher, Events::TEST_END, new TestEvent($test));
+        $eventDispatcher->dispatch(new TestEvent($test), Events::TEST_AFTER);
+        $eventDispatcher->dispatch(new TestEvent($test), Events::TEST_END);
+
         if ($test->getMetadata()->isBlocked()) {
             $output->writeln('');
             if ($skip = $test->getMetadata()->getSkip()) {
@@ -141,10 +140,7 @@ class DryRun extends Command
         $output->writeln('');
     }
 
-    /**
-     * @return Module&MockObject
-     */
-    private function mockModule($moduleName, ModuleContainer $moduleContainer)
+    private function mockModule(string $moduleName, ModuleContainer $moduleContainer): void
     {
         $module = $moduleContainer->getModule($moduleName);
         $class = new \ReflectionClass($module);
@@ -159,12 +155,8 @@ class DryRun extends Command
         $moduleContainer->mock($moduleName, Stub::makeEmpty($module, $methodResults));
     }
 
-    private function getDefaultResultForMethod(\ReflectionClass $class, ReflectionMethod $method)
+    private function getDefaultResultForMethod(\ReflectionClass $class, ReflectionMethod $method): mixed
     {
-        if (PHP_VERSION_ID < 70000) {
-            return new Maybe();
-        }
-
         $returnType = $method->getReturnType();
 
         if ($returnType === null || $returnType->allowsNull()) {
@@ -177,8 +169,7 @@ class DryRun extends Command
         if ($returnType instanceof ReflectionIntersectionType) {
             return $this->returnDefaultValueForIntersectionType($returnType);
         }
-
-        if (PHP_VERSION_ID >= 70100 && $returnType->isBuiltin()) {
+        if ($returnType->isBuiltin()) {
             return $this->getDefaultValueForBuiltinType($returnType);
         }
 
@@ -186,32 +177,21 @@ class DryRun extends Command
         return Stub::makeEmpty($typeName);
     }
 
-
-
-    private function getDefaultValueForBuiltinType(ReflectionType $returnType)
+    private function getDefaultValueForBuiltinType(ReflectionNamedType $returnType): mixed
     {
-        switch ($returnType->getName()) {
-            case 'mixed':
-            case 'void':
-                return null;
-            case 'string':
-                return '';
-            case 'int':
-                return 0;
-            case 'float':
-                return 0.0;
-            case 'bool':
-                return false;
-            case 'array':
-                return [];
-            case 'resource':
-                return fopen('data://text/plain;base64,', 'r');
-            default:
-                throw new \Exception('Unsupported return type ' . $returnType->getName());
-        }
+        return match ($returnType->getName()) {
+            'mixed', 'void' => null,
+            'string' => '',
+            'int' => 0,
+            'float' => 0.0,
+            'bool' => false,
+            'array' => [],
+            'resource' => fopen('data://text/plain;base64,', 'r'),
+            default => throw new Exception('Unsupported return type ' . $returnType->getName()),
+        };
     }
 
-    private function getDefaultValueOfUnionType($returnType)
+    private function getDefaultValueOfUnionType(ReflectionUnionType $returnType): mixed
     {
         $unionTypes = $returnType->getTypes();
         foreach ($unionTypes as $type) {
@@ -223,9 +203,9 @@ class DryRun extends Command
         return Stub::makeEmpty($unionTypes[0]);
     }
 
-    private function returnDefaultValueForIntersectionType(ReflectionIntersectionType $returnType)
+    private function returnDefaultValueForIntersectionType(ReflectionIntersectionType $returnType): mixed
     {
-        $extends    = null;
+        $extends = null;
         $implements = [];
         foreach ($returnType->getTypes() as $type) {
             if (class_exists($type->getName())) {
@@ -235,7 +215,7 @@ class DryRun extends Command
             }
         }
         $className = uniqid('anonymous_class_');
-        $code      = "abstract class $className";
+        $code = "abstract class $className";
         if ($extends !== null) {
             $code .= " extends \\$extends";
         }

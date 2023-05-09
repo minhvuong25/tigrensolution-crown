@@ -1,11 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Command;
 
 use Codeception\Configuration;
 use Stecman\Component\Symfony\Console\BashCompletion\Completion as ConsoleCompletion;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionInterface as ConsoleCompletionInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\ShellPathCompletion;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionCommand;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionHandler;
-use Stecman\Component\Symfony\Console\BashCompletion\Completion\ShellPathCompletion;
+use Symfony\Component\Console\Input\InputDefinition as SymfonyInputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,7 +23,7 @@ if (!class_exists(ConsoleCompletion::class)) {
 
 class Completion extends CompletionCommand
 {
-    protected function configureCompletion(CompletionHandler $handler)
+    protected function configureCompletion(CompletionHandler $handler): void
     {
         // Can't set for all commands, because it wouldn't work well with generate:suite
         $suiteCommands = [
@@ -26,7 +31,6 @@ class Completion extends CompletionCommand
             'config:validate',
             'console',
             'dry-run',
-            'generate:cept',
             'generate:cest',
             'generate:feature',
             'generate:phpunit',
@@ -41,26 +45,26 @@ class Completion extends CompletionCommand
             $handler->addHandler(new ConsoleCompletion(
                 $suiteCommand,
                 'suite',
-                ConsoleCompletion::TYPE_ARGUMENT,
+                ConsoleCompletionInterface::TYPE_ARGUMENT,
                 Configuration::suites()
             ));
         }
 
         $handler->addHandlers([
             new ShellPathCompletion(
-                ConsoleCompletion::ALL_COMMANDS,
+                ConsoleCompletionInterface::ALL_COMMANDS,
                 'path',
-                ConsoleCompletion::TYPE_ARGUMENT
+                ConsoleCompletionInterface::TYPE_ARGUMENT
             ),
             new ShellPathCompletion(
-                ConsoleCompletion::ALL_COMMANDS,
+                ConsoleCompletionInterface::ALL_COMMANDS,
                 'test',
-                ConsoleCompletion::TYPE_ARGUMENT
+                ConsoleCompletionInterface::TYPE_ARGUMENT
             ),
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('generate-hook') && $input->getOption('use-vendor-bin')) {
             global $argv;
@@ -71,7 +75,7 @@ class Completion extends CompletionCommand
         return 0;
     }
 
-    protected function createDefinition()
+    protected function createDefinition(): SymfonyInputDefinition
     {
         $definition = parent::createDefinition();
         $definition->addOption(new InputOption(

@@ -1,38 +1,27 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Codeception\Test\Test;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TestEvent extends Event
 {
     /**
-     * @var \PHPUnit\Framework\Test
+     * @param float|null $time Time taken
      */
-    protected $test;
-
-    /**
-     * @var float Time taken
-     */
-    protected $time;
-
-    public function __construct(\PHPUnit\Framework\Test $test, $time = 0)
+    public function __construct(protected Test $test, protected ?float $time = 0)
     {
-        $this->test = $test;
-        $this->time = $time;
     }
 
-    /**
-     * @return float
-     */
-    public function getTime()
+    public function getTime(): float
     {
         return $this->time;
     }
 
-    /**
-     * @return \Codeception\TestInterface
-     */
-    public function getTest()
+    public function getTest(): Test
     {
         return $this->test;
     }

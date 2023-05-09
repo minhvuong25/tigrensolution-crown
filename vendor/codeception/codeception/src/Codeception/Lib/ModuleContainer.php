@@ -1,15 +1,23 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Lib;
 
 use Codeception\Configuration;
 use Codeception\Exception\ConfigurationException;
+use Codeception\Exception\InjectionException;
 use Codeception\Exception\ModuleConflictException;
 use Codeception\Exception\ModuleException;
 use Codeception\Exception\ModuleRequireException;
 use Codeception\Lib\Interfaces\ConflictsWithModule;
 use Codeception\Lib\Interfaces\DependsOnModule;
 use Codeception\Lib\Interfaces\PartedModule;
+use Codeception\Module;
 use Codeception\Util\Annotation;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Class ModuleContainer
@@ -20,14 +28,17 @@ class ModuleContainer
     /**
      * @var string
      */
-    const MODULE_NAMESPACE = '\\Codeception\\Module\\';
+    public const MODULE_NAMESPACE = '\\Codeception\\Module\\';
 
     /**
-     * @var integer
+     * @var int
      */
-    const MAXIMUM_LEVENSHTEIN_DISTANCE = 5;
+    public const MAXIMUM_LEVENSHTEIN_DISTANCE = 5;
 
-    public static $packages = [
+    /**
+     * @var array<string, string>
+     */
+    public static array $packages = [
         'AMQP' => 'codeception/module-amqp',
         'Apc' => 'codeception/module-apc',
         'Asserts' => 'codeception/module-asserts',
@@ -56,55 +67,29 @@ class ModuleContainer
     ];
 
     /**
-     * @var array
+     * @var array<string,Module>
      */
-    private $config;
+    private array $modules = [];
 
-    /**
-     * @var Di
-     */
-    private $di;
+    private array $active = [];
 
-    /**
-     * @var array
-     */
-    private $modules = [];
+    private array $actions = [];
 
-    /**
-     * @var array
-     */
-    private $active = [];
-
-    /**
-     * @var array
-     */
-    private $actions = [];
-
-    /**
-     * Constructor.
-     *
-     * @param Di $di
-     * @param array $config
-     */
-    public function __construct(Di $di, $config)
+    public function __construct(private Di $di, private array $config)
     {
-        $this->di = $di;
         $this->di->set($this);
-        $this->config = $config;
     }
 
     /**
      * Create a module.
      *
-     * @param string $moduleName
-     * @param bool $active
-     * @return \Codeception\Module
-     * @throws \Codeception\Exception\ConfigurationException
-     * @throws \Codeception\Exception\ModuleException
-     * @throws \Codeception\Exception\ModuleRequireException
-     * @throws \Codeception\Exception\InjectionException
+     * @throws ConfigurationException
+     * @throws InjectionException
+     * @throws ModuleException
+     * @throws ModuleRequireException
+     * @throws ReflectionException
      */
-    public function create($moduleName, $active = true)
+    public function create(string $moduleName, bool $active = true): ?object
     {
         $this->active[$moduleName] = $active;
 
@@ -112,9 +97,9 @@ class ModuleContainer
         if (!class_exists($moduleClass)) {
             if (isset(self::$packages[$moduleName])) {
                 $package = self::$packages[$moduleName];
-                throw new ConfigurationException("Module $moduleName is not installed.\nUse Composer to install corresponding package:\n\ncomposer require $package --dev");
+                throw new ConfigurationException("Module {$moduleName} is not installed.\nUse Composer to install corresponding package:\n\ncomposer require {$package} --dev");
             }
-            throw new ConfigurationException("Module $moduleName could not be found and loaded");
+            throw new ConfigurationException("Module {$moduleName} could not be found and loaded");
         }
 
         $config = $this->getModuleConfig($moduleName);
@@ -125,8 +110,9 @@ class ModuleContainer
             // Explicitly setting $config to null skips this validation.
             $config = null;
         }
+        $this->modules[$moduleName] = $this->di->instantiate($moduleClass, [$this, $config], 'false');
 
-        $this->modules[$moduleName] = $module = $this->di->instantiate($moduleClass, [$this, $config], false);
+        $module = $this->modules[$moduleName];
 
         if ($this->moduleHasDependencies($module)) {
             $this->injectModuleDependencies($moduleName, $module);
@@ -137,39 +123,34 @@ class ModuleContainer
 
         foreach ($actions as $action) {
             $this->actions[$action] = $moduleName;
-        };
+        }
 
         return $module;
     }
 
     /**
      * Does a module have dependencies?
-     *
-     * @param \Codeception\Module $module
-     * @return bool
      */
-    private function moduleHasDependencies($module)
+    private function moduleHasDependencies(Module $module): bool
     {
         if (!$module instanceof DependsOnModule) {
             return false;
         }
 
-        return (bool) $module->_depends();
+        return (bool)$module->_depends();
     }
 
     /**
      * Get the actions of a module.
      *
-     * @param \Codeception\Module $module
-     * @param array $config
-     * @return array
+     * @return string[]
      */
-    private function getActionsForModule($module, $config)
+    private function getActionsForModule(Module $module, array $config): array
     {
-        $reflectionClass = new \ReflectionClass($module);
+        $reflectionClass = new ReflectionClass($module);
 
         // Only public methods can be actions
-        $methods = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
         // Should this module be loaded partially?
         $configuredParts = null;
@@ -189,13 +170,8 @@ class ModuleContainer
 
     /**
      * Should a method be included as an action?
-     *
-     * @param \Codeception\Module $module
-     * @param \ReflectionMethod $method
-     * @param array|null $configuredParts
-     * @return bool
      */
-    private function includeMethodAsAction($module, $method, $configuredParts = null)
+    private function includeMethodAsAction(Module $module, ReflectionMethod $method, array $configuredParts = null): bool
     {
         // Filter out excluded actions
         if ($module::$excludeActions && in_array($method->name, $module::$excludeActions)) {
@@ -210,17 +186,18 @@ class ModuleContainer
         // Do not include inherited actions if the static $includeInheritedActions property is set to false.
         // However, if an inherited action is also specified in the static $onlyActions property
         // it should be included as an action.
-        if (!$module::$includeInheritedActions &&
+        if (
+            !$module::$includeInheritedActions &&
             !in_array($method->name, $module::$onlyActions) &&
-            $method->getDeclaringClass()->getName() != get_class($module)
+            $method->getDeclaringClass()->getName() != $module::class
         ) {
             return false;
         }
 
         // Do not include hidden methods, methods with a name starting with an underscore
-        if (strpos($method->name, '_') === 0) {
+        if (str_starts_with($method->name, '_')) {
             return false;
-        };
+        }
 
         // If a part is configured for the module, only include actions from that part
         if ($configuredParts) {
@@ -235,22 +212,16 @@ class ModuleContainer
 
     /**
      * Is the module a helper?
-     *
-     * @param string $moduleName
-     * @return bool
      */
-    private function isHelper($moduleName)
+    private function isHelper(string $moduleName): bool
     {
-        return strpos($moduleName, '\\') !== false;
+        return str_contains($moduleName, '\\');
     }
 
     /**
      * Get the fully qualified class name for a module.
-     *
-     * @param string $moduleName
-     * @return string
      */
-    private function getModuleClass($moduleName)
+    private function getModuleClass(string $moduleName): string
     {
         if ($this->isHelper($moduleName)) {
             return $moduleName;
@@ -261,11 +232,8 @@ class ModuleContainer
 
     /**
      * Is a module instantiated in this ModuleContainer?
-     *
-     * @param string $moduleName
-     * @return bool
      */
-    public function hasModule($moduleName)
+    public function hasModule(string $moduleName): bool
     {
         return isset($this->modules[$moduleName]);
     }
@@ -273,11 +241,9 @@ class ModuleContainer
     /**
      * Get a module from this ModuleContainer.
      *
-     * @param string $moduleName
-     * @return \Codeception\Module
-     * @throws \Codeception\Exception\ModuleException
+     * @throws ModuleException
      */
-    public function getModule($moduleName)
+    public function getModule(string $moduleName): Module
     {
         if (!$this->hasModule($moduleName)) {
             $this->throwMissingModuleExceptionWithSuggestion(__CLASS__, $moduleName);
@@ -286,17 +252,17 @@ class ModuleContainer
         return $this->modules[$moduleName];
     }
 
-    public function throwMissingModuleExceptionWithSuggestion($className, $moduleName)
+    public function throwMissingModuleExceptionWithSuggestion(string $className, string $moduleName): void
     {
         $suggestedModuleNameInfo = $this->getModuleSuggestion($moduleName);
-        throw new ModuleException($className, "Module $moduleName couldn't be connected" . $suggestedModuleNameInfo);
+        throw new ModuleException($className, "Module {$moduleName} couldn't be connected" . $suggestedModuleNameInfo);
     }
 
-    protected function getModuleSuggestion($missingModuleName)
+    protected function getModuleSuggestion(string $missingModuleName): string
     {
         $shortestLevenshteinDistance = null;
         $suggestedModuleName = null;
-        foreach ($this->modules as $moduleName => $module) {
+        foreach (array_keys($this->modules) as $moduleName) {
             $levenshteinDistance = levenshtein($missingModuleName, $moduleName);
             if ($shortestLevenshteinDistance === null || $levenshteinDistance <= $shortestLevenshteinDistance) {
                 $shortestLevenshteinDistance = $levenshteinDistance;
@@ -305,7 +271,7 @@ class ModuleContainer
         }
 
         if ($suggestedModuleName !== null && $shortestLevenshteinDistance <= self::MAXIMUM_LEVENSHTEIN_DISTANCE) {
-            return " (did you mean '$suggestedModuleName'?)";
+            return " (did you mean '{$suggestedModuleName}'?)";
         }
 
         return '';
@@ -314,10 +280,9 @@ class ModuleContainer
     /**
      * Get the module for an action.
      *
-     * @param string $action
-     * @return \Codeception\Module|null This method returns null if there is no module for $action
+     * @return Module|null
      */
-    public function moduleForAction($action)
+    public function moduleForAction(string $action)
     {
         if (!isset($this->actions[$action])) {
             return null;
@@ -331,7 +296,7 @@ class ModuleContainer
      *
      * @return array An array with actions as keys and module names as values.
      */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
@@ -341,18 +306,15 @@ class ModuleContainer
      *
      * @return array An array with module names as keys and modules as values.
      */
-    public function all()
+    public function all(): array
     {
         return $this->modules;
     }
 
     /**
      * Mock a module in this ModuleContainer.
-     *
-     * @param string $moduleName
-     * @param object $mock
      */
-    public function mock($moduleName, $mock)
+    public function mock(string $moduleName, object $mock): void
     {
         $this->modules[$moduleName] = $mock;
     }
@@ -360,12 +322,10 @@ class ModuleContainer
     /**
      * Inject the dependencies of a module.
      *
-     * @param string $moduleName
-     * @param \Codeception\Lib\Interfaces\DependsOnModule $module
-     * @throws \Codeception\Exception\ModuleException
-     * @throws \Codeception\Exception\ModuleRequireException
+     * @throws ModuleException
+     * @throws ModuleRequireException
      */
-    private function injectModuleDependencies($moduleName, DependsOnModule $module)
+    private function injectModuleDependencies(string $moduleName, DependsOnModule $module): void
     {
         $this->checkForMissingDependencies($moduleName, $module);
 
@@ -373,9 +333,7 @@ class ModuleContainer
             throw new ModuleException($module, 'Module requires method _inject to be defined to accept dependencies');
         }
 
-        $dependencies = array_map(function ($dependency) {
-            return $this->create($dependency, false);
-        }, $this->getConfiguredDependencies($moduleName));
+        $dependencies = array_map(fn ($dependency): ?object => $this->create($dependency, false), $this->getConfiguredDependencies($moduleName));
 
         call_user_func_array([$module, '_inject'], $dependencies);
     }
@@ -383,12 +341,9 @@ class ModuleContainer
     /**
      * Check for missing dependencies.
      *
-     * @param string $moduleName
-     * @param \Codeception\Lib\Interfaces\DependsOnModule $module
-     * @throws \Codeception\Exception\ModuleException
-     * @throws \Codeception\Exception\ModuleRequireException
+     * @throws ModuleException|ModuleRequireException
      */
-    private function checkForMissingDependencies($moduleName, DependsOnModule $module)
+    private function checkForMissingDependencies(string $moduleName, $module): void
     {
         $dependencies = $this->getModuleDependencies($module);
         $configuredDependenciesCount = count($this->getConfiguredDependencies($moduleName));
@@ -409,11 +364,9 @@ class ModuleContainer
     /**
      * Get the dependencies of a module.
      *
-     * @param \Codeception\Lib\Interfaces\DependsOnModule $module
-     * @return array
-     * @throws \Codeception\Exception\ModuleException
+     * @throws ModuleException
      */
-    private function getModuleDependencies(DependsOnModule $module)
+    private function getModuleDependencies(DependsOnModule $module): array
     {
         $depends = $module->_depends();
 
@@ -422,7 +375,7 @@ class ModuleContainer
         }
 
         if (!is_array($depends)) {
-            $message = sprintf("Method _depends of module '%s' must return an array", get_class($module));
+            $message = sprintf("Method _depends of module '%s' must return an array", $module::class);
             throw new ModuleException($module, $message);
         }
 
@@ -431,11 +384,8 @@ class ModuleContainer
 
     /**
      * Get the configured dependencies for a module.
-     *
-     * @param string $moduleName
-     * @return array
      */
-    private function getConfiguredDependencies($moduleName)
+    private function getConfiguredDependencies(string $moduleName): array
     {
         $config = $this->getModuleConfig($moduleName);
 
@@ -448,12 +398,8 @@ class ModuleContainer
 
     /**
      * Get the error message for a module dependency that is missing.
-     *
-     * @param \Codeception\Module $module
-     * @param string $missingDependency
-     * @return string
      */
-    private function getErrorMessageForDependency($module, $missingDependency)
+    private function getErrorMessageForDependency(DependsOnModule $module, string $missingDependency): string
     {
         $depends = $module->_depends();
 
@@ -470,15 +416,10 @@ class ModuleContainer
      * This method checks both locations for configuration. If there is configuration at both locations
      * this method merges them, where the configuration at modules.enabled.$moduleName takes precedence
      * over modules.config.$moduleName if the same parameters are configured at both locations.
-     *
-     * @param string $moduleName
-     * @return array
      */
-    private function getModuleConfig($moduleName)
+    private function getModuleConfig(string $moduleName): array
     {
-        $config = isset($this->config['modules']['config'][$moduleName])
-            ? $this->config['modules']['config'][$moduleName]
-            : [];
+        $config = $this->config['modules']['config'][$moduleName] ?? [];
 
         if (!isset($this->config['modules']['enabled'])) {
             return $config;
@@ -495,7 +436,11 @@ class ModuleContainer
 
             $enabledModuleName = key($enabledModuleConfig);
             if ($enabledModuleName === $moduleName) {
-                return Configuration::mergeConfigs(reset($enabledModuleConfig), $config);
+                $moduleConfig = reset($enabledModuleConfig);
+                if (!is_array($moduleConfig)) {
+                    return $config;
+                }
+                return Configuration::mergeConfigs($moduleConfig, $config);
             }
         }
 
@@ -505,9 +450,9 @@ class ModuleContainer
     /**
      * Check if there are conflicting modules in this ModuleContainer.
      *
-     * @throws \Codeception\Exception\ModuleConflictException
+     * @throws ModuleConflictException
      */
-    public function validateConflicts()
+    public function validateConflicts(): void
     {
         $canConflict = [];
         foreach ($this->modules as $moduleName => $module) {
@@ -528,11 +473,9 @@ class ModuleContainer
     /**
      * Check if the modules passed as arguments to this method conflict with each other.
      *
-     * @param \Codeception\Module $module
-     * @param \Codeception\Module $otherModule
-     * @throws \Codeception\Exception\ModuleConflictException
+     * @throws ModuleConflictException
      */
-    private function validateConflict($module, $otherModule)
+    private function validateConflict(Module $module, Module $otherModule): void
     {
         if ($module === $otherModule || !$module instanceof ConflictsWithModule) {
             return;
@@ -548,10 +491,9 @@ class ModuleContainer
      * Normalize the return value of ConflictsWithModule::_conflicts() to a class name.
      * This is necessary because it can return a module name instead of the name of a class or interface.
      *
-     * @param string $conflicts
-     * @return string
+     * @return class-string|Module|string
      */
-    private function normalizeConflictSpecification($conflicts)
+    private function normalizeConflictSpecification(string $conflicts)
     {
         if (interface_exists($conflicts) || class_exists($conflicts)) {
             return $conflicts;

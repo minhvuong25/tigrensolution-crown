@@ -1,111 +1,93 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception;
 
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use PHPUnit\Framework\AssertionFailedError;
 use Traversable;
 
-class Example implements \ArrayAccess, \Countable, \IteratorAggregate
+class Example implements ArrayAccess, Countable, IteratorAggregate
 {
-    protected $data;
-
-    public function __construct($data)
+    public function __construct(protected $data)
     {
-        $this->data = $data;
     }
 
-    #[\ReturnTypeWillChange]
     /**
-     * Whether a offset exists
+     * Whether an offset exists
+     *
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
-     * An offset to check for.
-     * </p>
-     * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
+     * @param mixed $offset <p>An offset to check for.</p>
+     * @return bool true on success or false on failure.
      * The return value will be casted to boolean if non-boolean was returned.
-     * @since 5.0.0
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->data);
     }
 
-    #[\ReturnTypeWillChange]
     /**
      * Offset to retrieve
+     *
      * @link https://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
-     * The offset to retrieve.
-     * </p>
+     * @param mixed $offset <p>The offset to retrieve.</p>
      * @return mixed Can return all value types.
-     * @since 5.0.0
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         if (!$this->offsetExists($offset)) {
-            throw new \PHPUnit\Framework\AssertionFailedError("Example $offset doesn't exist");
-        };
+            throw new AssertionFailedError(sprintf("Example %s doesn't exist", $offset));
+        }
         return $this->data[$offset];
     }
 
-    #[\ReturnTypeWillChange]
     /**
      * Offset to set
+     *
      * @link https://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
-     * The offset to assign the value to.
-     * </p>
-     * @param mixed $value <p>
-     * The value to set.
-     * </p>
-     * @return void
-     * @since 5.0.0
+     * @param mixed $offset <p>The offset to assign the value to.</p>
+     * @param mixed $value <p>The value to set.</p>
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->data[$offset] = $value;
     }
 
-    #[\ReturnTypeWillChange]
     /**
      * Offset to unset
+     *
      * @link https://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
-     * The offset to unset.
-     * </p>
-     * @return void
-     * @since 5.0.0
+     * @param mixed $offset <p>The offset to unset.</p>
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->data[$offset]);
     }
 
-    #[\ReturnTypeWillChange]
     /**
      * Count elements of an object
+     *
      * @link https://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
-     * </p>
-     * <p>
      * The return value is cast to an integer.
-     * @since 5.1.0
      */
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }
 
-    #[\ReturnTypeWillChange]
     /**
      * Retrieve an external iterator
+     *
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
-     * <b>Traversable</b>
-     * @since 5.0.0
+     * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->data);
+        return new ArrayIterator($this->data);
     }
 }

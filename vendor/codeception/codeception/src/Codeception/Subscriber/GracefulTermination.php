@@ -1,50 +1,62 @@
 <?php
-declare (ticks = 1);
+
+declare(strict_types=1);
+declare(ticks=1);
+
 namespace Codeception\Subscriber;
 
 use Codeception\Event\SuiteEvent;
 use Codeception\Events;
+use Codeception\ResultAggregator;
+use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+use function function_exists;
+use function pcntl_async_signals;
+use function pcntl_signal;
 
 class GracefulTermination implements EventSubscriberInterface
 {
-    const SIGNAL_FUNC = 'pcntl_signal';
-    const ASYNC_SIGNAL_HANDLING_FUNC = 'pcntl_async_signals';
-
     /**
-     * @var SuiteEvent
+     * @var string
      */
-    protected $suiteEvent;
+    public const SIGNAL_FUNC = 'pcntl_signal';
+    /**
+     * @var string
+     */
+    public const ASYNC_SIGNAL_HANDLING_FUNC = 'pcntl_async_signals';
 
-    public function handleSuite(SuiteEvent $event)
+    public function __construct(private ResultAggregator $resultAggregator)
     {
-        if (PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 0) {
-            // skip for PHP 7.0: https://github.com/Codeception/Codeception/issues/3607
-            return;
-        }
+    }
+
+    public function handleSuite(SuiteEvent $event): void
+    {
         if (function_exists(self::ASYNC_SIGNAL_HANDLING_FUNC)) {
             pcntl_async_signals(true);
         }
         if (function_exists(self::SIGNAL_FUNC)) {
-            pcntl_signal(SIGTERM, [$this, 'terminate']);
-            pcntl_signal(SIGINT, [$this, 'terminate']);
+            pcntl_signal(SIGTERM, function (): void {
+                $this->terminate();
+            });
+            pcntl_signal(SIGINT, function (): void {
+                $this->terminate();
+            });
         }
-
-        $this->suiteEvent = $event;
     }
 
-    public function terminate()
+    public function terminate(): void
     {
-        if ($this->suiteEvent) {
-            $this->suiteEvent->getResult()->stopOnError(true);
-            $this->suiteEvent->getResult()->stopOnFailure(true);
-        }
-        throw new \RuntimeException(
+        $this->resultAggregator->stop();
+        throw new RuntimeException(
             "\n\n---------------------------\nTESTS EXECUTION TERMINATED\n---------------------------\n"
         );
     }
 
-    public static function getSubscribedEvents()
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedEvents(): array
     {
         if (!function_exists(self::SIGNAL_FUNC)) {
             return [];

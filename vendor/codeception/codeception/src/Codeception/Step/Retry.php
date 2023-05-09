@@ -1,15 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Codeception\Step;
 
 use Codeception\Lib\ModuleContainer;
 use Codeception\Util\Template;
+use Exception;
+
+use function codecept_debug;
+use function ucfirst;
+use function usleep;
 
 class Retry extends Assertion implements GeneratedStep
 {
+    protected static string $methodTemplate = <<<EOF
 
-    protected static $methodTemplate = <<<EOF
-    
     /**
      * [!] Method is generated.
      * 
@@ -26,15 +32,10 @@ class Retry extends Assertion implements GeneratedStep
     }
 EOF;
 
-    private $retryNum;
-    private $retryInterval;
-
-    public function __construct($action, array $arguments, $retryNum, $retryInterval)
+    public function __construct($action, array $arguments, private int $retryNum, private int $retryInterval)
     {
         $this->action = $action;
         $this->arguments = $arguments;
-        $this->retryNum = $retryNum;
-        $this->retryInterval = $retryInterval;
     }
 
     public function run(ModuleContainer $container = null)
@@ -45,37 +46,37 @@ EOF;
             try {
                 $this->isTry = $retry < $this->retryNum;
                 return parent::run($container);
-            } catch (\Exception $e) {
-                $retry++;
+            } catch (Exception $e) {
+                ++$retry;
                 if (!$this->isTry) {
                     throw $e;
                 }
-                codecept_debug("Retrying #$retry in ${interval}ms");
+                codecept_debug("Retrying #{$retry} in {$interval}ms");
                 usleep($interval * 1000);
                 $interval *= 2;
             }
         }
     }
 
-    public static function getTemplate(Template $template)
+    public static function getTemplate(Template $template): ?Template
     {
         $action = $template->getVar('action');
 
-        if ((strpos($action, 'have') === 0) || (strpos($action, 'am') === 0)) {
-            return; // dont retry conditions
+        if ((str_starts_with($action, 'have')) || (str_starts_with($action, 'am'))) {
+            return null; // dont retry conditions
         }
 
-        if (strpos($action, 'wait') === 0) {
-            return; // dont retry waiters
+        if (str_starts_with($action, 'wait')) {
+            return null; // dont retry waiters
         }
 
-        $doc = "* Executes $action and retries on failure.";
+        $doc = "* Executes {$action} and retries on failure.";
 
         return (new Template(self::$methodTemplate))
             ->place('method', $template->getVar('method'))
             ->place('module', $template->getVar('module'))
             ->place('params', $template->getVar('params'))
             ->place('doc', $doc)
-            ->place('action', 'retry'. ucfirst($action));
+            ->place('action', 'retry' . ucfirst($action));
     }
 }

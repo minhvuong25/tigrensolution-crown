@@ -1,53 +1,25 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Event;
 
+use Codeception\ResultAggregator;
 use Codeception\Suite;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SuiteEvent extends Event
 {
-    /**
-     * @var \PHPUnit\Framework\TestSuite
-     */
-    protected $suite;
-
-    /**
-     * @var \PHPUnit\Framework\TestResult
-     */
-    protected $result;
-
-    /**
-     * @var array
-     */
-    protected $settings;
-
-    public function __construct(
-        \PHPUnit\Framework\TestSuite $suite,
-        \PHPUnit\Framework\TestResult $result = null,
-        $settings = []
-    ) {
-        $this->suite = $suite;
-        $this->result = $result;
-        $this->settings = $settings;
+    public function __construct(protected ?Suite $suite = null, protected array $settings = [])
+    {
     }
 
-    /**
-     * @return Suite
-     */
-    public function getSuite()
+    public function getSuite(): ?Suite
     {
         return $this->suite;
     }
 
-    /**
-     * @return \PHPUnit\Framework\TestResult
-     */
-    public function getResult()
-    {
-        return $this->result;
-    }
-
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }

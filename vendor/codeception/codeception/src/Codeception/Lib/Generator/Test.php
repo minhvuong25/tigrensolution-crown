@@ -1,26 +1,28 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Lib\Generator;
 
 use Codeception\Configuration;
+use Codeception\Lib\Generator\Shared\Classname;
 use Codeception\Util\Shared\Namespaces;
 use Codeception\Util\Template;
 
 class Test
 {
     use Namespaces;
-    use Shared\Classname;
+    use Classname;
 
-    protected $template = <<<EOF
+    protected string $template = <<<EOF
 <?php
+
 {{namespace}}
+
 class {{name}}Test extends \Codeception\Test\Unit
 {
 {{tester}}
     protected function _before()
-    {
-    }
-
-    protected function _after()
     {
     }
 
@@ -30,41 +32,39 @@ class {{name}}Test extends \Codeception\Test\Unit
 
     }
 }
+
 EOF;
 
-    protected $testerTemplate = <<<EOF
-    /**
-     * @var \{{actorClass}}
-     */
-    protected \${{actor}};
-    
+    protected string $testerTemplate = <<<EOF
+
+    protected {{actorClass}} \${{actor}};
+
 EOF;
 
+    protected string $name;
 
-    protected $settings;
-    protected $name;
-
-    public function __construct($settings, $name)
+    public function __construct(protected array $settings, string $name)
     {
-        $this->settings = $settings;
         $this->name = $this->removeSuffix($name, 'Test');
     }
 
-    public function produce()
+    public function produce(): string
     {
         $actor = $this->settings['actor'];
-        if ($this->settings['namespace']) {
-            $actor = $this->settings['namespace'] . '\\' . $actor;
+
+        $ns = $this->getNamespaceHeader($this->settings['namespace'] . '\\' . ucfirst($this->settings['suite']) . '\\' . $this->name);
+
+        if ($ns) {
+            $ns .= "\nuse " . $this->supportNamespace() . $actor . ";";
         }
 
-        $ns = $this->getNamespaceHeader($this->settings['namespace'] . '\\' . $this->name);
 
         $tester = '';
         if ($this->settings['actor']) {
             $tester = (new Template($this->testerTemplate))
-            ->place('actorClass', $actor)
-            ->place('actor', lcfirst(Configuration::config()['actor_suffix']))
-            ->produce();
+                ->place('actorClass', $actor)
+                ->place('actor', lcfirst(Configuration::config()['actor_suffix']))
+                ->produce();
         }
 
         return (new Template($this->template))

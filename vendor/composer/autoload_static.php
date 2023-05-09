@@ -204,6 +204,7 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         'a8c41acf1bcf2c8c39616ad2b1e630fb' => __DIR__ . '/..' . '/magento/module-analytics/registration.php',
         '56f4400ce26dd5a5d1a6efb9e2f5d128' => __DIR__ . '/..' . '/magento/module-quote-graph-ql/registration.php',
         '8ace14821cff5beb90efc58dfd9c8b3b' => __DIR__ . '/..' . '/magento/module-media-gallery-synchronization-api/registration.php',
+        '2a3c2110e8e0295330dc3d11a4cbc4cb' => __DIR__ . '/..' . '/php-webdriver/webdriver/lib/Exception/TimeoutException.php',
         'b0a44809b5ec8c6edb0d5f52ef3a56a2' => __DIR__ . '/..' . '/magento/module-inventory-configuration/registration.php',
         '93e55f9c32abdc30fb8545fc661e68a5' => __DIR__ . '/..' . '/magento/module-eav-graph-ql/registration.php',
         '19b03cc33c349b5e5fbc6577c2f9dc87' => __DIR__ . '/..' . '/magento/module-catalog-url-rewrite/registration.php',
@@ -212,6 +213,7 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         '3ce6447b6ef8a0e6e2a3cec20fba30e3' => __DIR__ . '/..' . '/magento/module-instant-purchase/registration.php',
         '47402ddfee46771bcf36e616cf38b137' => __DIR__ . '/..' . '/magento/module-variable/registration.php',
         '5c7dcd6ec83d6cf2988a97cdcba365ed' => __DIR__ . '/..' . '/magento/module-catalog-rule/registration.php',
+        '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         'e3b2795a8a512b6083af088fb53afe6c' => __DIR__ . '/..' . '/codeception/codeception/functions.php',
         '94873d6b1410a90e995471e2f15612bc' => __DIR__ . '/..' . '/magento/module-adobe-ims/registration.php',
         '9944ade184ae5fe1e30491426d3a4f16' => __DIR__ . '/..' . '/magento/module-inventory-distance-based-source-selection-api/registration.php',
@@ -296,7 +298,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         '940bf170cf88b648b1e7cf4ec3411196' => __DIR__ . '/..' . '/magento/module-swatches/registration.php',
         '3e066e7b5a29d63f855a7fafac672b08' => __DIR__ . '/..' . '/magento/module-weee/registration.php',
         '056cd8d2398ceabe9e3cff88f4cf877b' => __DIR__ . '/..' . '/magento/theme-frontend-blank/registration.php',
-        '2a3c2110e8e0295330dc3d11a4cbc4cb' => __DIR__ . '/..' . '/php-webdriver/webdriver/lib/Exception/TimeoutException.php',
         'feb21ef5dcabb4d2c7710be9f670692b' => __DIR__ . '/..' . '/swissup/module-core/registration.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         'c7784b5ca2b82b30ead008049149530e' => __DIR__ . '/..' . '/magento/module-admin-adobe-ims-two-factor-auth/registration.php',
@@ -375,6 +376,7 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         '87bb82aba4e6954227316088ec049d42' => __DIR__ . '/..' . '/magento/module-translation/registration.php',
         '7adedf5aab7954091befcc50d50f5120' => __DIR__ . '/..' . '/paypal/module-braintree-graph-ql/registration.php',
         'b3af4141c2b6c2616b0e9b1109f7c2dd' => __DIR__ . '/..' . '/temando/module-shipping-remover/registration.php',
+        'a3b8fb13a112e3be232ab3c07b8a884f' => __DIR__ . '/..' . '/codeception/module-sequence/src/Codeception/Util/sq.php',
         'c63d777742b9988dda52cb3a0755278e' => __DIR__ . '/..' . '/magento/google-shopping-ads/registration.php',
         '4444551b69a588f0c3ae204e139ba1a0' => __DIR__ . '/..' . '/magento/language-de_de/registration.php',
         '45575ff1060646888de912d9e76d5b9e' => __DIR__ . '/..' . '/magento/language-en_us/registration.php',
@@ -580,10 +582,12 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         'Q' => 
         array (
             'Qameta\\Allure\\PHPUnit\\' => 22,
+            'Qameta\\Allure\\Codeception\\' => 26,
             'Qameta\\Allure\\' => 14,
         ),
         'P' => 
         array (
+            'Psy\\' => 4,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
@@ -597,7 +601,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
             'PayPal\\Braintree\\' => 17,
             'PayPal\\BraintreeGraphQl\\' => 24,
             'ParagonIE\\ConstantTime\\' => 23,
-            'PHPStan\\PhpDocParser\\' => 21,
             'PDepend\\' => 8,
         ),
         'O' => 
@@ -609,7 +612,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         array (
             'Monolog\\' => 8,
             'Migration\\' => 10,
-            'Metadata\\' => 9,
             'Magento\\Wishlist\\' => 17,
             'Magento\\WishlistGraphQl\\' => 24,
             'Magento\\WishlistAnalytics\\' => 26,
@@ -1007,7 +1009,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
             'Jose\\Component\\Core\\Util\\Ecc\\' => 29,
             'Jose\\' => 5,
             'JmesPath\\' => 9,
-            'JMS\\Serializer\\' => 15,
         ),
         'G' => 
         array (
@@ -1049,7 +1050,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
             'Composer\\ClassMapGenerator\\' => 27,
             'Composer\\CaBundle\\' => 18,
             'Composer\\' => 9,
-            'Codeception\\PHPUnit\\' => 20,
             'Codeception\\Extension\\' => 22,
             'Codeception\\' => 12,
         ),
@@ -1275,9 +1275,17 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         array (
             0 => __DIR__ . '/..' . '/allure-framework/allure-phpunit/src',
         ),
+        'Qameta\\Allure\\Codeception\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/allure-framework/allure-codeception/src',
+        ),
         'Qameta\\Allure\\' => 
         array (
             0 => __DIR__ . '/..' . '/allure-framework/allure-php-commons/src',
+        ),
+        'Psy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psy/psysh/src',
         ),
         'Psr\\Log\\' => 
         array (
@@ -1332,10 +1340,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         array (
             0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
-        'PHPStan\\PhpDocParser\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
-        ),
         'PDepend\\' => 
         array (
             0 => __DIR__ . '/..' . '/pdepend/pdepend/src/main/php/PDepend',
@@ -1355,10 +1359,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         'Migration\\' => 
         array (
             0 => __DIR__ . '/..' . '/magento/data-migration-tool/src/Migration',
-        ),
-        'Metadata\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/jms/metadata/src',
         ),
         'Magento\\Wishlist\\' => 
         array (
@@ -2936,10 +2936,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         array (
             0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
         ),
-        'JMS\\Serializer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/jms/serializer/src',
-        ),
         'GuzzleHttp\\Stream\\' => 
         array (
             0 => __DIR__ . '/..' . '/ezimuel/guzzlestreams/src',
@@ -3044,10 +3040,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         array (
             0 => __DIR__ . '/..' . '/composer/composer/src/Composer',
         ),
-        'Codeception\\PHPUnit\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/codeception/phpunit-wrapper/src',
-        ),
         'Codeception\\Extension\\' => 
         array (
             0 => __DIR__ . '/..' . '/codeception/codeception/ext',
@@ -3125,15 +3117,6 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
             'Zend_Cache' => 
             array (
                 0 => __DIR__ . '/..' . '/magento/zend-cache/library',
-            ),
-        ),
-        'Y' => 
-        array (
-            'Yandex' => 
-            array (
-                0 => __DIR__ . '/..' . '/allure-framework/allure-codeception/src',
-                1 => __DIR__ . '/..' . '/allure-framework/allure-php-api/src',
-                2 => __DIR__ . '/..' . '/allure-framework/allure-php-api/test',
             ),
         ),
         'P' => 
@@ -3238,15 +3221,28 @@ class ComposerStaticInit05321871a0f7bf8b5b6fc1a41ee9c290
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Cm_Cache_Backend_File' => __DIR__ . '/..' . '/colinmollenhour/cache-backend-file/File.php',
         'Cm_Cache_Backend_Redis' => __DIR__ . '/..' . '/colinmollenhour/cache-backend-redis/Cm/Cache/Backend/Redis.php',
+        'Codeception\\Constraint\\Page' => __DIR__ . '/..' . '/codeception/lib-web/src/Constraint/Page.php',
+        'Codeception\\Constraint\\WebDriver' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Constraint/WebDriver.php',
+        'Codeception\\Constraint\\WebDriverNot' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Constraint/WebDriverNot.php',
         'Codeception\\Exception\\ConnectionException' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Exception/ConnectionException.php',
-        'Codeception\\Lib\\Interfaces\\ScreenshotSaver' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Lib/Interfaces/ScreenshotSaver.php',
-        'Codeception\\Lib\\Interfaces\\SessionSnapshot' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Lib/Interfaces/SessionSnapshot.php',
+        'Codeception\\Exception\\ElementNotFound' => __DIR__ . '/..' . '/codeception/lib-web/src/Exception/ElementNotFound.php',
+        'Codeception\\Exception\\MalformedLocatorException' => __DIR__ . '/..' . '/codeception/lib-web/src/Exception/MalformedLocatorException.php',
+        'Codeception\\Lib\\Interfaces\\ElementLocator' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/ElementLocator.php',
+        'Codeception\\Lib\\Interfaces\\MultiSession' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/MultiSession.php',
+        'Codeception\\Lib\\Interfaces\\PageSourceSaver' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/PageSourceSaver.php',
+        'Codeception\\Lib\\Interfaces\\Remote' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/Remote.php',
+        'Codeception\\Lib\\Interfaces\\ScreenshotSaver' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/ScreenshotSaver.php',
+        'Codeception\\Lib\\Interfaces\\SessionSnapshot' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/SessionSnapshot.php',
+        'Codeception\\Lib\\Interfaces\\Web' => __DIR__ . '/..' . '/codeception/lib-web/src/Lib/Interfaces/Web.php',
         'Codeception\\Module\\AbstractAsserts' => __DIR__ . '/..' . '/codeception/module-asserts/src/Codeception/Module/AbstractAsserts.php',
         'Codeception\\Module\\Asserts' => __DIR__ . '/..' . '/codeception/module-asserts/src/Codeception/Module/Asserts.php',
         'Codeception\\Module\\Sequence' => __DIR__ . '/..' . '/codeception/module-sequence/src/Codeception/Module/Sequence.php',
         'Codeception\\Module\\WebDriver' => __DIR__ . '/..' . '/codeception/module-webdriver/src/Codeception/Module/WebDriver.php',
+        'Codeception\\PHPUnit\\TestCase' => __DIR__ . '/..' . '/codeception/codeception/src/PHPUnit/TestCase.php',
+        'Codeception\\Util\\Locator' => __DIR__ . '/..' . '/codeception/lib-web/src/Util/Locator.php',
         'Codeception\\Util\\Shared\\Asserts' => __DIR__ . '/..' . '/codeception/lib-asserts/src/Codeception/Util/Shared/Asserts.php',
         'Codeception\\Util\\Shared\\InheritedAsserts' => __DIR__ . '/..' . '/codeception/lib-asserts/src/Codeception/Util/Shared/InheritedAsserts.php',
+        'Codeception\\Util\\Uri' => __DIR__ . '/..' . '/codeception/lib-web/src/Util/Uri.php',
         'Collator' => __DIR__ . '/..' . '/symfony/intl/Resources/stubs/Collator.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'CredisException' => __DIR__ . '/..' . '/colinmollenhour/credis/Client.php',

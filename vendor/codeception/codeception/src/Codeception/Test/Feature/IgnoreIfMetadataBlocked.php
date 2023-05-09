@@ -1,23 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Test\Feature;
 
+use Codeception\Event\FailEvent;
+use Codeception\ResultAggregator;
 use Codeception\Test\Metadata;
+use PHPUnit\Framework\IncompleteTestError;
+use PHPUnit\Framework\SkippedTestError;
+use PHPUnit\Framework\SkippedWithMessageException;
+use PHPUnit\Runner\Version as PHPUnitVersion;
 
 trait IgnoreIfMetadataBlocked
 {
-    /**
-     * @return Metadata
-     */
-    abstract protected function getMetadata();
+    abstract public function getMetadata(): Metadata;
 
-    abstract protected function ignore($ignored);
+    abstract protected function ignore(bool $ignored): void;
 
-    /**
-     * @return \PHPUnit\Framework\TestResult
-     */
-    abstract protected function getTestResultObject();
+    abstract protected function getResultAggregator(): ResultAggregator;
 
-    protected function ignoreIfMetadataBlockedStart()
+    protected function ignoreIfMetadataBlockedStart(): void
     {
         if (!$this->getMetadata()->isBlocked()) {
             return;
@@ -26,12 +29,20 @@ trait IgnoreIfMetadataBlocked
         $this->ignore(true);
 
         if ($this->getMetadata()->getSkip() !== null) {
-            $this->getTestResultObject()->addFailure($this, new \PHPUnit\Framework\SkippedTestError((string)$this->getMetadata()->getSkip()), 0);
+            $skipMessage = (string)$this->getMetadata()->getSkip();
+            if (PHPUnitVersion::series() < 10) {
+                $skippedTestError = new SkippedTestError($skipMessage);
+            } else {
+                $skippedTestError = new SkippedWithMessageException($skipMessage);
+            }
+
+            $this->getResultAggregator()->addFailure(new FailEvent($this, $skippedTestError, 0));
             return;
         }
+
         if ($this->getMetadata()->getIncomplete() !== null) {
-            $this->getTestResultObject()->addFailure($this, new \PHPUnit\Framework\IncompleteTestError((string)$this->getMetadata()->getIncomplete()), 0);
-            return;
+            $incompleteTestError = new IncompleteTestError((string)$this->getMetadata()->getIncomplete());
+            $this->getResultAggregator()->addFailure(new FailEvent($this, $incompleteTestError, 0));
         }
     }
 }

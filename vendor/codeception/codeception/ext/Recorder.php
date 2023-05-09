@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Codeception\Extension;
 
 use Codeception\Event\StepEvent;
 use Codeception\Event\TestEvent;
 use Codeception\Events;
 use Codeception\Exception\ExtensionException;
+use Codeception\Extension;
 use Codeception\Lib\Interfaces\ScreenshotSaver;
 use Codeception\Module\WebDriver;
 use Codeception\Step;
@@ -13,6 +16,36 @@ use Codeception\Step\Comment as CommentStep;
 use Codeception\Test\Descriptor;
 use Codeception\Util\FileSystem;
 use Codeception\Util\Template;
+use DateTime;
+use DirectoryIterator;
+use Exception;
+use Symfony\Contracts\EventDispatcher\Event;
+
+use function array_diff;
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_unique;
+use function basename;
+use function codecept_output_dir;
+use function codecept_relative_path;
+use function dirname;
+use function file_put_contents;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function mkdir;
+use function preg_match;
+use function preg_replace;
+use function sprintf;
+use function str_pad;
+use function str_replace;
+use function strcasecmp;
+use function strlen;
+use function substr;
+use function trim;
+use function ucfirst;
+use function uniqid;
 
 /**
  * Saves a screenshot of each step in acceptance tests and shows them as a slideshow on one HTML page (here's an [example](https://codeception.com/images/recorder.gif))
@@ -68,10 +101,9 @@ use Codeception\Util\Template;
  * ```
  *
  */
-class Recorder extends \Codeception\Extension
+class Recorder extends Extension
 {
-    /** @var array */
-    protected $config = [
+    protected array $config = [
         'delete_successful'    => true,
         'module'               => 'WebDriver',
         'template'             => null,
@@ -84,8 +116,7 @@ class Recorder extends \Codeception\Extension
         'include_microseconds' => false,
     ];
 
-    /** @var string */
-    protected $template = <<<EOF
+    protected string $template = <<<EOF
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,13 +229,11 @@ class Recorder extends \Codeception\Extension
 </html>
 EOF;
 
-    /** @var string */
-    protected $indicatorTemplate = <<<EOF
+    protected string $indicatorTemplate = <<<EOF
 <li data-target="#steps" data-slide-to="{{step}}" class="{{isActive}}"></li>
 EOF;
 
-    /** @var string */
-    protected $indexTemplate = <<<EOF
+    protected string $indexTemplate = <<<EOF
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,8 +263,7 @@ EOF;
 
 EOF;
 
-    /** @var string */
-    protected $slidesTemplate = <<<EOF
+    protected string $slidesTemplate = <<<EOF
 <div class="carousel-item {{isActive}}">
     <img class="mx-auto d-block mh-100" src="{{image}}">
     <div class="carousel-caption {{isError}}">
@@ -245,8 +273,7 @@ EOF;
 </div>
 EOF;
 
-    /** @var array */
-    public static $events = [
+    public static array $events = [
         Events::SUITE_BEFORE => 'beforeSuite',
         Events::SUITE_AFTER  => 'afterSuite',
         Events::TEST_BEFORE  => 'before',
@@ -256,46 +283,33 @@ EOF;
         Events::STEP_AFTER   => 'afterStep',
     ];
 
-    /** @var WebDriver */
-    protected $webDriverModule;
+    protected ?\Codeception\Module $webDriverModule = null;
 
-    /** @var string */
-    protected $dir;
+    protected ?string $dir = null;
 
-    /** @var array */
-    protected $slides = [];
+    protected array $slides = [];
 
-    /** @var int */
-    protected $stepNum = 0;
+    protected int $stepNum = 0;
 
-    /** @var string */
-    protected $seed;
+    protected ?string $seed = null;
 
-    /** @var array */
-    protected $seeds;
+    protected array $seeds = [];
 
-    /** @var array */
-    protected $recordedTests = [];
+    protected array $recordedTests = [];
 
-    /** @var array */
-    protected $skipRecording = [];
+    protected array $skipRecording = [];
 
-    /** @var array */
-    protected $errorMessages = [];
+    protected array $errorMessages = [];
 
-    /** @var bool */
-    protected $colors;
+    protected bool $colors = false;
 
-    /** @var bool */
-    protected $ansi;
+    protected bool $ansi = false;
 
-    /** @var array */
-    protected $timeStamps = [];
+    protected array $timeStamps = [];
 
-    /** @var string */
-    private $dateFormat;
+    private ?string $dateFormat = null;
 
-    public function beforeSuite()
+    public function beforeSuite(): void
     {
         $this->webDriverModule = null;
         if (!$this->hasModule($this->config['module'])) {
@@ -329,14 +343,14 @@ EOF;
         $this->writeln("Directory Format: <debug>record_{$this->seed}_{filename}_{testname}</debug> ----");
     }
 
-    public function afterSuite()
+    public function afterSuite(): void
     {
         if (!$this->webDriverModule) {
             return;
         }
         $links = '';
 
-        if (count($this->slides)) {
+        if (!empty($this->slides)) {
             foreach ($this->recordedTests as $suiteName => $suite) {
                 $links .= "<ul><li><b>{$suiteName}</b></li><ul>";
                 foreach ($suite as $fileName => $tests) {
@@ -361,7 +375,7 @@ EOF;
 
             try {
                 file_put_contents(codecept_output_dir() . 'records.html', $indexHTML);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->writeln(
                     "⏺ An exception occurred while saving records.html: <info>{$exception->getMessage()}</info>"
                 );
@@ -375,10 +389,7 @@ EOF;
         }
     }
 
-    /**
-     * @param TestEvent $e
-     */
-    public function before(TestEvent $e)
+    public function before(TestEvent $event): void
     {
         if (!$this->webDriverModule) {
             return;
@@ -388,12 +399,12 @@ EOF;
         $this->slides = [];
         $this->timeStamps = [];
 
-        $this->dir = codecept_output_dir() . "record_{$this->seed}_{$this->getTestName($e)}";
-        $testPath = codecept_relative_path(Descriptor::getTestFullName($e->getTest()));
+        $this->dir = codecept_output_dir() . "record_{$this->seed}_{$this->getTestName($event)}";
+        $testPath = codecept_relative_path(Descriptor::getTestFullName($event->getTest()));
 
         try {
             !is_dir($this->dir) && !mkdir($this->dir) && !is_dir($this->dir);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->skipRecording[] = $testPath;
             $this->appendErrorMessage(
                 $testPath,
@@ -402,14 +413,11 @@ EOF;
         }
     }
 
-    /**
-     * @param TestEvent $e
-     */
-    public function cleanup(TestEvent $e)
+    public function cleanup(TestEvent $event): void
     {
         if ($this->config['delete_orphaned']) {
             $recordingDirectories = [];
-            $directories = new \DirectoryIterator(codecept_output_dir());
+            $directories = new DirectoryIterator(codecept_output_dir());
 
             // getting a list of currently present recording directories
             foreach ($directories as $directory) {
@@ -431,7 +439,7 @@ EOF;
             return;
         }
         if (!$this->config['delete_successful']) {
-            $this->persist($e);
+            $this->persist($event);
 
             return;
         }
@@ -440,28 +448,25 @@ EOF;
         FileSystem::deleteDir($this->dir);
     }
 
-    /**
-     * @param TestEvent $e
-     */
-    public function persist(TestEvent $e)
+    public function persist(TestEvent $event): void
     {
         if (!$this->webDriverModule) {
             return;
         }
         $indicatorHtml = '';
         $slideHtml = '';
-        $testName = $this->getTestName($e);
-        $testPath = codecept_relative_path(Descriptor::getTestFullName($e->getTest()));
+        $testName = $this->getTestName($event);
+        $testPath = codecept_relative_path(Descriptor::getTestFullName($event->getTest()));
         $dir = codecept_output_dir() . "record_{$this->seed}_$testName";
         $status = 'success';
 
-        if (strcasecmp($this->dir, $dir) !== 0) {
-            $filename = str_pad(0, 3, '0', STR_PAD_LEFT) . '.png';
+        if (strcasecmp($this->dir ?? '', $dir) !== 0) {
+            $filename = str_pad('0', 3, '0', STR_PAD_LEFT) . '.png';
 
             try {
                 !is_dir($dir) && !mkdir($dir) && !is_dir($dir);
                 $this->dir = $dir;
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->skipRecording[] = $testPath;
                 $this->appendErrorMessage(
                     $testPath,
@@ -472,7 +477,7 @@ EOF;
             $this->slides = [];
             $this->timeStamps = [];
             $this->slides[$filename] = new Step\Action('encountered an unexpected error prior to the test execution');
-            $this->timeStamps[$filename] = (new \DateTime())->format($this->dateFormat);
+            $this->timeStamps[$filename] = (new DateTime())->format($this->dateFormat);
             $status = 'error';
 
             try {
@@ -481,7 +486,7 @@ EOF;
                 }
 
                 $this->webDriverModule->webDriver->takeScreenshot($this->dir . DIRECTORY_SEPARATOR . $filename);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->appendErrorMessage(
                     $testPath,
                     "⏺ Unable to capture a screenshot for <info>{$testPath}/before</info>"
@@ -513,19 +518,19 @@ EOF;
             $html = (new Template($this->template))
                 ->place('indicators', $indicatorHtml)
                 ->place('slides', $slideHtml)
-                ->place('feature', ucfirst($e->getTest()->getFeature()))
-                ->place('test', Descriptor::getTestSignature($e->getTest()))
+                ->place('feature', ucfirst($event->getTest()->getFeature()))
+                ->place('test', Descriptor::getTestSignature($event->getTest()))
                 ->place('carousel_class', $this->config['animate_slides'] ? ' slide' : '')
                 ->produce();
 
             $indexFile = $this->dir . DIRECTORY_SEPARATOR . 'index.html';
-            $environment = $e->getTest()->getMetadata()->getCurrent('env') ?: '';
-            $suite = ucfirst(basename(\dirname($e->getTest()->getMetadata()->getFilename())));
-            $testName = basename($e->getTest()->getMetadata()->getFilename());
+            $environment = $event->getTest()->getMetadata()->getCurrent('env') ?: '';
+            $suite = ucfirst(basename(dirname($event->getTest()->getMetadata()->getFilename())));
+            $testName = basename($event->getTest()->getMetadata()->getFilename());
 
             try {
                 file_put_contents($indexFile, $html);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->skipRecording[] = $testPath;
                 $this->appendErrorMessage(
                     $testPath,
@@ -535,7 +540,7 @@ EOF;
             }
 
             $this->recordedTests["{$suite} ({$environment})"][$testName][] = [
-                'name' => $e->getTest()->getMetadata()->getName(),
+                'name' => $event->getTest()->getMetadata()->getName(),
                 'path' => $testPath,
                 'status' => $status,
                 'index' => substr($indexFile, strlen(codecept_output_dir())),
@@ -543,25 +548,22 @@ EOF;
         }
     }
 
-    /**
-     * @param StepEvent $e
-     */
-    public function afterStep(StepEvent $e)
+    public function afterStep(StepEvent $event): void
     {
         if ($this->webDriverModule === null || $this->dir === null) {
             return;
         }
 
-        if ($e->getStep() instanceof CommentStep) {
+        if ($event->getStep() instanceof CommentStep) {
             return;
         }
 
         // only taking the ignore step into consideration if that step has passed
-        if ($this->isStepIgnored($e) && !$e->getStep()->hasFailed()) {
+        if ($this->isStepIgnored($event) && !$event->getStep()->hasFailed()) {
             return;
         }
 
-        $filename = str_pad($this->stepNum, 3, '0', STR_PAD_LEFT) . '.png';
+        $filename = str_pad((string)$this->stepNum, 3, '0', STR_PAD_LEFT) . '.png';
 
         try {
             if ($this->webDriverModule->webDriver === null) {
@@ -569,28 +571,23 @@ EOF;
             }
 
             $this->webDriverModule->webDriver->takeScreenshot($this->dir . DIRECTORY_SEPARATOR . $filename);
-        } catch (\Exception $exception) {
-            $testPath = codecept_relative_path(Descriptor::getTestFullName($e->getTest()));
+        } catch (Exception $exception) {
+            $testPath = codecept_relative_path(Descriptor::getTestFullName($event->getTest()));
             $this->appendErrorMessage(
                 $testPath,
-                "⏺ Unable to capture a screenshot for <info>{$testPath}/{$e->getStep()->getAction()}</info>"
+                "⏺ Unable to capture a screenshot for <info>{$testPath}/{$event->getStep()->getAction()}</info>"
             );
         }
 
-        $this->stepNum++;
-        $this->slides[$filename] = $e->getStep();
-        $this->timeStamps[$filename] = (new \DateTime())->format($this->dateFormat);
+        ++$this->stepNum;
+        $this->slides[$filename] = $event->getStep();
+        $this->timeStamps[$filename] = (new DateTime())->format($this->dateFormat);
     }
 
-    /**
-     * @param StepEvent $e
-     *
-     * @return bool
-     */
-    protected function isStepIgnored(StepEvent $e)
+    protected function isStepIgnored(StepEvent $event): bool
     {
         $configIgnoredSteps = $this->config['ignore_steps'];
-        $annotationIgnoredSteps = $e->getTest()->getMetadata()->getParam('skipRecording');
+        $annotationIgnoredSteps = $event->getTest()->getMetadata()->getParam('skipRecording');
 
         $ignoredSteps = array_unique(
             array_merge(
@@ -602,12 +599,13 @@ EOF;
         foreach ($ignoredSteps as $stepPattern) {
             $stepRegexp = '/^' . str_replace('*', '.*?', $stepPattern) . '$/i';
 
-            if (preg_match($stepRegexp, $e->getStep()->getAction())) {
+            if (preg_match($stepRegexp, $event->getStep()->getAction())) {
                 return true;
             }
 
-            if ($e->getStep()->getMetaStep() !== null &&
-                preg_match($stepRegexp, $e->getStep()->getMetaStep()->getAction())
+            if (
+                $event->getStep()->getMetaStep() !== null &&
+                preg_match($stepRegexp, $event->getStep()->getMetaStep()->getAction())
             ) {
                 return true;
             }
@@ -617,35 +615,26 @@ EOF;
     }
 
     /**
-     * @param StepEvent|TestEvent $e
-     *
-     * @return string
+     * @param StepEvent|TestEvent $event
      */
-    private function getTestName($e)
+    private function getTestName(Event $event): string
     {
-        return basename($e->getTest()->getMetadata()->getFilename()) . '_' . preg_replace('/[^A-Za-z0-9\-\_]/', '_', $e->getTest()->getMetadata()->getName());
+        return basename($event->getTest()->getMetadata()->getFilename()) . '_' . preg_replace('/[^A-Za-z0-9\-\_]/', '_', $event->getTest()->getMetadata()->getName());
     }
 
-    /**
-     * @param string $message
-     */
-    protected function writeln($message)
+    protected function writeln(iterable|string $messages): void
     {
         parent::writeln(
             $this->ansi
-            ? $message
-            : trim(preg_replace('/[ ]{2,}/', ' ', str_replace('⏺', '', $message)))
+            ? $messages
+            : trim(preg_replace('/[ ]{2,}/', ' ', str_replace('⏺', '', $messages)))
         );
     }
 
-    /**
-     * @param string $testPath
-     * @param string $message
-     */
-    private function appendErrorMessage($testPath, $message)
+    private function appendErrorMessage(string $testPath, string $message): void
     {
         $this->errorMessages[$testPath] = array_merge(
-            array_key_exists($testPath, $this->errorMessages) ? $this->errorMessages[$testPath]: [],
+            array_key_exists($testPath, $this->errorMessages) ? $this->errorMessages[$testPath] : [],
             [$message]
         );
     }
