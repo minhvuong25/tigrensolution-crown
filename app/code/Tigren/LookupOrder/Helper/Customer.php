@@ -13,6 +13,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App as App;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
@@ -30,7 +31,11 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Sales\Api\OrderAddressRepositoryInterface;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use RuntimeException;
+
 
 /**
  * Class Customer
@@ -121,7 +126,28 @@ class Customer extends AbstractHelper
     protected $_addressCollectionFactory;
 
     /**
-     * @param App\Helper\Context $context
+     * @var
+     */
+    protected $filterBuilder;
+    /**
+     * @var
+     */
+    protected $OrderAddressRepositoryInterface;
+    /**
+     * @var OrderAddressRepositoryInterface
+     */
+    private $orderAddressRepositoryInterface;
+    /**
+     * @var
+     */
+    private $OrderStatusHistoryRepositoryInterface;
+    /**
+     * @var OrderStatusHistoryRepositoryInterface
+     */
+    private $orderStatusHistoryRepositoryInterface;
+
+    /**
+     * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param Registry $coreRegistry
      * @param Session $customerSession
@@ -132,7 +158,8 @@ class Customer extends AbstractHelper
      * @param RedirectFactory $resultRedirectFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param CollectionFactory $addressCollectionFactory
-     * @param Order $order
+     * @param OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface
+     * @param OrderAddressRepositoryInterface $OrderAddressRepositoryInterface
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteria
      *
@@ -150,6 +177,8 @@ class Customer extends AbstractHelper
         RedirectFactory $resultRedirectFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         CollectionFactory $addressCollectionFactory,
+        OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface,
+        OrderAddressRepositoryInterface $OrderAddressRepositoryInterface,
         OrderRepositoryInterface $orderRepository = null,
         SearchCriteriaBuilder $searchCriteria = null
     ) {
@@ -162,6 +191,8 @@ class Customer extends AbstractHelper
         $this->orderFactory = $orderFactory;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->orderAddressRepositoryInterface = $OrderAddressRepositoryInterface;
+        $this->orderStatusHistoryRepositoryInterface = $orderStatusHistoryRepositoryInterface;
         $this->_addressCollectionFactory = $addressCollectionFactory;
         $this->orderRepository = $orderRepository ?: ObjectManager::getInstance()
             ->get(OrderRepositoryInterface::class);
@@ -215,36 +246,49 @@ class Customer extends AbstractHelper
                     (!empty($post['oar_email'])) ||
                     (!empty($post['oar_ordercomments'])) ||
                     (!empty($post['oar_phonenumber']))) {
-                    $orderCollection = $this->_addressCollectionFactory->create();
                     if (!empty($post['oar_email'])) {
-                        $orderCollection->addFieldToFilter('email', $post['oar_email']);
+                        $ordersearch = $this->orderRepository->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('customer_email', $post['oar_email'])
+                                ->create());
                     }
                     if (!empty($post['oar_zip'])) {
-                        $orderCollection->addFieldToFilter('postcode', $post['oar_zip']);
+                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('postcode', $post['oar_zip'])
+                                ->create());
                     }
                     if (!empty($post['oar_billing_lastname'])) {
-                        $orderCollection->addFieldToFilter('lastname', $post['oar_billing_lastname']);
+                        $ordersearch = $this->orderRepository->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('customer_lastname', $post['oar_billing_lastname'])
+                                ->create());
                     }
                     if (!empty($post['oar_company'])) {
-                        $orderCollection->addFieldToFilter(
-                            'company',
-                            array('like' => '%' . $post['oar_company'] . '%')
-                        );
+                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('company',
+                                    array('like' => '%' . $post['oar_company'] . '%'))
+                                ->create());
                     }
                     if (!empty($post['oar_phonenumber'])) {
-                        $orderCollection->addFieldToFilter('telephone', $post['oar_phonenumber']);
+                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('telephone',
+                                    $post['oar_phonenumber'])
+                                ->create());
                     }
                     if (!empty($post['oar_ordercomments'])) {
-                        $orderCollection->getSelect()
-                            ->joinLeft(
-                                ['sosh' => $orderCollection->getTable('sales_order_status_history')],
-                                'sosh.parent_id = main_table.parent_id',
-                                ['sosh.comment']
-                            )->where("sosh.comment LIKE '%" . $post['oar_ordercomments'] . "%'");
-                    }
 
-                    if (!empty($orderCollection->getItems())) {
-                        $items = $orderCollection->getItems();
+                        $ordersearch = $this->orderStatusHistoryRepositoryInterface->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('comment',
+                                    $post['oar_ordercomments'])
+                                ->create());
+                    }
+                    if (!empty($ordersearch->getItems())) {
+                        $items = $ordersearch->getItems();
+
                         $orderIds = [];
                         foreach ($items as $item) {
                             $orderIds[] = $item->getParentId();
