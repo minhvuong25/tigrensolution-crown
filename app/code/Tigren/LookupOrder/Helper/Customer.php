@@ -29,6 +29,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Status\History\CollectionFactory as HistoryCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Api\FilterBuilder;
@@ -145,6 +146,7 @@ class Customer extends AbstractHelper
      * @var OrderStatusHistoryRepositoryInterface
      */
     private $orderStatusHistoryRepositoryInterface;
+    protected $historyCollectionFactory;
 
     /**
      * @param Context $context
@@ -180,7 +182,9 @@ class Customer extends AbstractHelper
         OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface,
         OrderAddressRepositoryInterface $OrderAddressRepositoryInterface,
         OrderRepositoryInterface $orderRepository = null,
-        SearchCriteriaBuilder $searchCriteria = null
+        SearchCriteriaBuilder $searchCriteria = null,
+        FilterBuilder $filterBuilder,
+        HistoryCollectionFactory $historyCollectionFactory
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->storeManager = $storeManager;
@@ -189,11 +193,13 @@ class Customer extends AbstractHelper
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         $this->messageManager = $messageManager;
         $this->orderFactory = $orderFactory;
+        $this->historyCollectionFactory = $historyCollectionFactory;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderAddressRepositoryInterface = $OrderAddressRepositoryInterface;
         $this->orderStatusHistoryRepositoryInterface = $orderStatusHistoryRepositoryInterface;
         $this->_addressCollectionFactory = $addressCollectionFactory;
+        $this->filterBuilder = $filterBuilder;
         $this->orderRepository = $orderRepository ?: ObjectManager::getInstance()
             ->get(OrderRepositoryInterface::class);
         $this->searchCriteriaBuilder = $searchCriteria ?: ObjectManager::getInstance()
@@ -246,129 +252,150 @@ class Customer extends AbstractHelper
                     (!empty($post['oar_email'])) ||
                     (!empty($post['oar_ordercomments'])) ||
                     (!empty($post['oar_phonenumber']))) {
-                    if (!empty($post['oar_email'])) {
-                        $ordersearch = $this->orderRepository->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('customer_email', $post['oar_email'])
-                                ->create());
-                    }
-                    if (!empty($post['oar_zip'])) {
-                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('postcode', $post['oar_zip'])
-                                ->create());
-                    }
-                    if (!empty($post['oar_billing_lastname'])) {
-                        $ordersearch = $this->orderRepository->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('customer_lastname', $post['oar_billing_lastname'])
-                                ->create());
-                    }
-                    if (!empty($post['oar_company'])) {
-                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('company',
-                                    array('like' => '%' . $post['oar_company'] . '%'))
-                                ->create());
-                    }
-                    if (!empty($post['oar_phonenumber'])) {
-                        $ordersearch = $this->orderAddressRepositoryInterface->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('telephone',
-                                    $post['oar_phonenumber'])
-                                ->create());
-                    }
-                    if (!empty($post['oar_ordercomments'])) {
 
-                        $ordersearch = $this->orderStatusHistoryRepositoryInterface->getList(
-                            $this->searchCriteriaBuilder
-                                ->addFilter('comment',
-                                    $post['oar_ordercomments'])
-                                ->create());
-                    }
-                    if (!empty($ordersearch->getItems())) {
-                        $items = $ordersearch->getItems();
+                    $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
+                        $this->searchCriteriaBuilder
+                            ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%','like')
+                            ->create())->getItems();
 
-                        $orderIds = [];
-                        foreach ($items as $item) {
-                            $orderIds[] = $item->getParentId();
-                        }
-                        $orders = [];
-                        foreach (array_unique($orderIds) as $orderId) {
-                            $orders[] = $this->orderRepository->get($orderId);
-                        }
-                        $this->coreRegistry->register('current_order', $orders);
-                        return true;
-                    } else {
-                        $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
-                        return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+                    if(!empty( $post['oar_email'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('email', $post['oar_email']) ;
                     }
+                    if(!empty( $post['oar_billing_lastname'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('lastname', $post['oar_billing_lastname']) ;
+                    }
+                    if(!empty( $post['oar_zip'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('postcode', $post['oar_zip']) ;
+                        //a
+                    }
+                    if(!empty( $post['oar_phonenumber'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('telephone', $post['oar_phonenumber']) ;
+                    } if(!empty( $post['company'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('company', '%' . $post['company'] . '%','like') ;
+                    }
+
+
+                    $orderSearchbyAddress = $this->orderAddressRepositoryInterface->getList(
+                        $this->searchCriteriaBuilder
+                            ->create())->getItems();
+                    $CommentIds = [];
+                    $orderSIds = [];
+                    foreach ($orderSearchByComment as $commentid){
+                        $CommentIds[] = $commentid->getParentId();
+                    }
+                    if(!empty($orderSearchbyAddress))
+                    {
+                        foreach ($orderSearchbyAddress as $commentid){
+                            $orderSIds[] = $commentid->getParentId();
+                        }
+                    }
+
+
+
+                     $ordersId = array_intersect($CommentIds,$orderSIds);
+
+                    $ordersearch = $this->orderRepository
+                        ->getList($this->searchCriteriaBuilder
+                            ->addFilter('entity_id',$ordersId)
+                            ->create());
+
+
+                if (!empty($ordersearch->getItems())) {
+                    $items = $ordersearch->getItems();
+                    $orderIds = [];
+
+                    foreach ($items as $item) {
+                        $orderIds[] = $item->getEntityId();
+
+                    }
+
+                    $orders = [];
+                    foreach (array_unique($orderIds) as $orderId) {
+                        $orders[] = $this->orderRepository->get($orderId);
+                    }
+                    $this->coreRegistry->register('current_order', $orders);
+                    return true;
                 } else {
                     $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
                     return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
             }
-        } catch (InputException $e) {
-            $this->messageManager->addErrorMessage($e->getMessage());
-            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+      else {
+                $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
+                return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+            }
         }
-    }
+        } catch (InputException $e)
+{
+$this->messageManager->addErrorMessage($e->getMessage());
+return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+}
+}
 
-    /**
-     * Get Breadcrumbs for current controller action
-     *
-     * @param Page $resultPage
-     * @return void
-     */
-    public function getBreadcrumbs(Page $resultPage)
-    {
-        $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
-        if (!$breadcrumbs) {
-            return;
-        }
-        $breadcrumbs->addCrumb(
-            'home',
-            [
-                'label' => __('Home'),
-                'title' => __('Go to Home Page'),
-                'link' => $this->storeManager->getStore()->getBaseUrl()
-            ]
-        );
-        $breadcrumbs->addCrumb(
-            'cms_page',
-            ['label' => __('Order Information'), 'title' => __('Order Information')]
-        );
+/**
+ * Get Breadcrumbs for current controller action
+ *
+ * @param Page $resultPage
+ * @return void
+ */
+public
+function getBreadcrumbs(Page $resultPage)
+{
+    $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
+    if (!$breadcrumbs) {
+        return;
     }
+    $breadcrumbs->addCrumb(
+        'home',
+        [
+            'label' => __('Home'),
+            'title' => __('Go to Home Page'),
+            'link' => $this->storeManager->getStore()->getBaseUrl()
+        ]
+    );
+    $breadcrumbs->addCrumb(
+        'cms_page',
+        ['label' => __('Order Information'), 'title' => __('Order Information')]
+    );
+}
 
-    /**
-     * @param $path
-     * @param int $storeId
-     * @return mixed
-     */
-    public function getGeneralConfig($path, $storeId = null)
-    {
-        return $this->scopeConfig->getValue(
-            $path,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-    }
+/**
+ * @param $path
+ * @param int $storeId
+ * @return mixed
+ */
+public
+function getGeneralConfig($path, $storeId = null)
+{
+    return $this->scopeConfig->getValue(
+        $path,
+        ScopeInterface::SCOPE_STORE,
+        $storeId
+    );
+}
 
-    /**
-     * @param $path
-     * @param int $storeId
-     * @return mixed
-     */
-    public function getModuleConfig($path, $storeId = null)
-    {
-        return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
-    }
+/**
+ * @param $path
+ * @param int $storeId
+ * @return mixed
+ */
+public
+function getModuleConfig($path, $storeId = null)
+{
+    return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
+}
 
-    /**
-     *
-     */
-    public function getCustomerGroupId()
-    {
-        return $this->customerSession->getCustomer()->getGroupId();
-    }
+/**
+ *
+ */
+public
+function getCustomerGroupId()
+{
+    return $this->customerSession->getCustomer()->getGroupId();
+}
 }
