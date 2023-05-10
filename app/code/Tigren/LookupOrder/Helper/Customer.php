@@ -244,15 +244,6 @@ class Customer extends AbstractHelper
                     return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
             } else {
-
-
-                if ((!empty($post['oar_zip'])) ||
-                    (!empty($post['oar_billing_lastname'])) ||
-                    (!empty($post['oar_company'])) ||
-                    (!empty($post['oar_email'])) ||
-                    (!empty($post['oar_ordercomments'])) ||
-                    (!empty($post['oar_phonenumber']))) {
-
                     $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
                         $this->searchCriteriaBuilder
                             ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%','like')
@@ -295,8 +286,6 @@ class Customer extends AbstractHelper
                         }
                     }
 
-
-
                      $ordersId = array_intersect($CommentIds,$orderSIds);
 
                     $ordersearch = $this->orderRepository
@@ -325,11 +314,6 @@ class Customer extends AbstractHelper
                     return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
             }
-      else {
-                $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
-                return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-            }
-        }
         } catch (InputException $e)
 {
 $this->messageManager->addErrorMessage($e->getMessage());
