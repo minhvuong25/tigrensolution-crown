@@ -13,6 +13,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App as App;
 use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
@@ -28,9 +29,14 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Status\History\CollectionFactory as HistoryCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Sales\Api\OrderAddressRepositoryInterface;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use RuntimeException;
+
 
 /**
  * Class Customer
@@ -121,7 +127,29 @@ class Customer extends AbstractHelper
     protected $_addressCollectionFactory;
 
     /**
-     * @param App\Helper\Context $context
+     * @var
+     */
+    protected $filterBuilder;
+    /**
+     * @var
+     */
+    protected $OrderAddressRepositoryInterface;
+    /**
+     * @var OrderAddressRepositoryInterface
+     */
+    private $orderAddressRepositoryInterface;
+    /**
+     * @var
+     */
+    private $OrderStatusHistoryRepositoryInterface;
+    /**
+     * @var OrderStatusHistoryRepositoryInterface
+     */
+    private $orderStatusHistoryRepositoryInterface;
+    protected $historyCollectionFactory;
+
+    /**
+     * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param Registry $coreRegistry
      * @param Session $customerSession
@@ -132,7 +160,8 @@ class Customer extends AbstractHelper
      * @param RedirectFactory $resultRedirectFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param CollectionFactory $addressCollectionFactory
-     * @param Order $order
+     * @param OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface
+     * @param OrderAddressRepositoryInterface $OrderAddressRepositoryInterface
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteria
      *
@@ -150,8 +179,12 @@ class Customer extends AbstractHelper
         RedirectFactory $resultRedirectFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         CollectionFactory $addressCollectionFactory,
+        OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface,
+        OrderAddressRepositoryInterface $OrderAddressRepositoryInterface,
         OrderRepositoryInterface $orderRepository = null,
-        SearchCriteriaBuilder $searchCriteria = null
+        SearchCriteriaBuilder $searchCriteria = null,
+        FilterBuilder $filterBuilder,
+        HistoryCollectionFactory $historyCollectionFactory
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->storeManager = $storeManager;
@@ -160,9 +193,13 @@ class Customer extends AbstractHelper
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         $this->messageManager = $messageManager;
         $this->orderFactory = $orderFactory;
+        $this->historyCollectionFactory = $historyCollectionFactory;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->orderAddressRepositoryInterface = $OrderAddressRepositoryInterface;
+        $this->orderStatusHistoryRepositoryInterface = $orderStatusHistoryRepositoryInterface;
         $this->_addressCollectionFactory = $addressCollectionFactory;
+        $this->filterBuilder = $filterBuilder;
         $this->orderRepository = $orderRepository ?: ObjectManager::getInstance()
             ->get(OrderRepositoryInterface::class);
         $this->searchCriteriaBuilder = $searchCriteria ?: ObjectManager::getInstance()
@@ -215,116 +252,149 @@ class Customer extends AbstractHelper
                     (!empty($post['oar_email'])) ||
                     (!empty($post['oar_ordercomments'])) ||
                     (!empty($post['oar_phonenumber']))) {
-                    $orderCollection = $this->_addressCollectionFactory->create();
-                    if (!empty($post['oar_email'])) {
-                        $orderCollection->addFieldToFilter('email', $post['oar_email']);
+
+                    $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
+                        $this->searchCriteriaBuilder
+                            ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%','like')
+                            ->create())->getItems();
+
+                    if(!empty( $post['oar_email'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('email', $post['oar_email']) ;
                     }
-                    if (!empty($post['oar_zip'])) {
-                        $orderCollection->addFieldToFilter('postcode', $post['oar_zip']);
+                    if(!empty( $post['oar_billing_lastname'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('lastname', $post['oar_billing_lastname']) ;
                     }
-                    if (!empty($post['oar_billing_lastname'])) {
-                        $orderCollection->addFieldToFilter('lastname', $post['oar_billing_lastname']);
+                    if(!empty( $post['oar_zip'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('postcode', $post['oar_zip']) ;
                     }
-                    if (!empty($post['oar_company'])) {
-                        $orderCollection->addFieldToFilter(
-                            'company',
-                            array('like' => '%' . $post['oar_company'] . '%')
-                        );
-                    }
-                    if (!empty($post['oar_phonenumber'])) {
-                        $orderCollection->addFieldToFilter('telephone', $post['oar_phonenumber']);
-                    }
-                    if (!empty($post['oar_ordercomments'])) {
-                        $orderCollection->getSelect()
-                            ->joinLeft(
-                                ['sosh' => $orderCollection->getTable('sales_order_status_history')],
-                                'sosh.parent_id = main_table.parent_id',
-                                ['sosh.comment']
-                            )->where("sosh.comment LIKE '%" . $post['oar_ordercomments'] . "%'");
+                    if(!empty( $post['oar_phonenumber'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('telephone', $post['oar_phonenumber']) ;
+                    } if(!empty( $post['company'])){
+                        $this->searchCriteriaBuilder
+                            ->addFilter('company', '%' . $post['company'] . '%','like') ;
                     }
 
-                    if (!empty($orderCollection->getItems())) {
-                        $items = $orderCollection->getItems();
-                        $orderIds = [];
-                        foreach ($items as $item) {
-                            $orderIds[] = $item->getParentId();
-                        }
-                        $orders = [];
-                        foreach (array_unique($orderIds) as $orderId) {
-                            $orders[] = $this->orderRepository->get($orderId);
-                        }
-                        $this->coreRegistry->register('current_order', $orders);
-                        return true;
-                    } else {
-                        $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
-                        return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+
+                    $orderSearchbyAddress = $this->orderAddressRepositoryInterface->getList(
+                        $this->searchCriteriaBuilder
+                            ->create())->getItems();
+                    $CommentIds = [];
+                    $orderSIds = [];
+                    foreach ($orderSearchByComment as $commentid){
+                        $CommentIds[] = $commentid->getParentId();
                     }
+                    if(!empty($orderSearchbyAddress))
+                    {
+                        foreach ($orderSearchbyAddress as $commentid){
+                            $orderSIds[] = $commentid->getParentId();
+                        }
+                    }
+
+
+
+                     $ordersId = array_intersect($CommentIds,$orderSIds);
+
+                    $ordersearch = $this->orderRepository
+                        ->getList($this->searchCriteriaBuilder
+                            ->addFilter('entity_id',$ordersId)
+                            ->create());
+
+
+                if (!empty($ordersearch->getItems())) {
+                    $items = $ordersearch->getItems();
+                    $orderIds = [];
+
+                    foreach ($items as $item) {
+                        $orderIds[] = $item->getEntityId();
+
+                    }
+
+                    $orders = [];
+                    foreach (array_unique($orderIds) as $orderId) {
+                        $orders[] = $this->orderRepository->get($orderId);
+                    }
+                    $this->coreRegistry->register('current_order', $orders);
+                    return true;
                 } else {
                     $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
                     return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
             }
-        } catch (InputException $e) {
-            $this->messageManager->addErrorMessage($e->getMessage());
-            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+      else {
+                $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
+                return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+            }
         }
-    }
+        } catch (InputException $e)
+{
+$this->messageManager->addErrorMessage($e->getMessage());
+return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+}
+}
 
-    /**
-     * Get Breadcrumbs for current controller action
-     *
-     * @param Page $resultPage
-     * @return void
-     */
-    public function getBreadcrumbs(Page $resultPage)
-    {
-        $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
-        if (!$breadcrumbs) {
-            return;
-        }
-        $breadcrumbs->addCrumb(
-            'home',
-            [
-                'label' => __('Home'),
-                'title' => __('Go to Home Page'),
-                'link' => $this->storeManager->getStore()->getBaseUrl()
-            ]
-        );
-        $breadcrumbs->addCrumb(
-            'cms_page',
-            ['label' => __('Order Information'), 'title' => __('Order Information')]
-        );
+/**
+ * Get Breadcrumbs for current controller action
+ *
+ * @param Page $resultPage
+ * @return void
+ */
+public
+function getBreadcrumbs(Page $resultPage)
+{
+    $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
+    if (!$breadcrumbs) {
+        return;
     }
+    $breadcrumbs->addCrumb(
+        'home',
+        [
+            'label' => __('Home'),
+            'title' => __('Go to Home Page'),
+            'link' => $this->storeManager->getStore()->getBaseUrl()
+        ]
+    );
+    $breadcrumbs->addCrumb(
+        'cms_page',
+        ['label' => __('Order Information'), 'title' => __('Order Information')]
+    );
+}
 
-    /**
-     * @param $path
-     * @param int $storeId
-     * @return mixed
-     */
-    public function getGeneralConfig($path, $storeId = null)
-    {
-        return $this->scopeConfig->getValue(
-            $path,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-    }
+/**
+ * @param $path
+ * @param int $storeId
+ * @return mixed
+ */
+public
+function getGeneralConfig($path, $storeId = null)
+{
+    return $this->scopeConfig->getValue(
+        $path,
+        ScopeInterface::SCOPE_STORE,
+        $storeId
+    );
+}
 
-    /**
-     * @param $path
-     * @param int $storeId
-     * @return mixed
-     */
-    public function getModuleConfig($path, $storeId = null)
-    {
-        return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
-    }
+/**
+ * @param $path
+ * @param int $storeId
+ * @return mixed
+ */
+public
+function getModuleConfig($path, $storeId = null)
+{
+    return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
+}
 
-    /**
-     *
-     */
-    public function getCustomerGroupId()
-    {
-        return $this->customerSession->getCustomer()->getGroupId();
-    }
+/**
+ *
+ */
+public
+function getCustomerGroupId()
+{
+    return $this->customerSession->getCustomer()->getGroupId();
+}
 }

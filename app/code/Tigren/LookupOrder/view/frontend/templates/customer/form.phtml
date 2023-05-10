@@ -18,46 +18,46 @@
         <div class="field id">
             <label class="label" for="oar-order-id"><span><?= $block->escapeHtml(__('Order Number')) ?></span></label>
             <div class="control">
-                <input type="text" class="input-text" id="oar-order-id" name="oar_order_id"/>
+                <input type="text" required class="input-text" id="oar-order-id" name="oar_order_id"/>
             </div>
         </div>
         <div id="oar-phonenumber" class="field phonenumber">
             <label class="label" for="oar_phonenumber"><span><?= $block->escapeHtml(__('Phone Number')) ?></span></label>
             <div class="control">
-                <input type="text"  class="input-text" id="oar_phonenumber" name="oar_phonenumber"
+                <input type="text" required class="input-text" id="oar_phonenumber" name="oar_phonenumber"
                        data-validate="{'validate-phonenumber':true}"/>
             </div>
         </div>
         <div id="oar-ordercomments" class="field ordercomments">
             <label class="label" for="oar_ordercomment"><span><?= $block->escapeHtml(__('Order Comments')) ?></span></label>
             <div class="control">
-                <input type="text"  class="input-text" id="oar_ordercomments" name="oar_ordercomments"
+                <input type="text" required  class="input-text" id="oar_ordercomments" name="oar_ordercomments"
                        data-validate="{'validate-ordercomment':true}"/>
             </div>
         </div>
         <div id="oar-email" class="field email">
             <label class="label" for="oar_email"><span><?= $block->escapeHtml(__('Email Address')) ?></span></label>
             <div class="control">
-                <input type="email"  class="input-text" id="oar_email" name="oar_email"
+                <input type="email" required class="input-text" id="oar_email" name="oar_email"
                        data-validate="{'validate-email':true}"/>
             </div>
         </div>
         <div id="oar-zip" class="field zip">
             <label class="label" for="oar_zip"><span><?= $block->escapeHtml(__('ZIP Code')) ?></span></label>
             <div class="control">
-                <input type="text"  class="input-text" id="oar_zip" name="oar_zip"/>
+                <input type="text" required  class="input-text" id="oar_zip" name="oar_zip"/>
             </div>
         </div>
         <div class="field lastname">
             <label class="label" for="oar-billing-lastname"><span><?= $block->escapeHtml(__('Customer Last Name')) ?></span></label>
             <div class="control">
-                <input type="text"  class="input-text" id="oar-billing-lastname" name="oar_billing_lastname"/>
+                <input type="text" required class="input-text" id="oar-billing-lastname" name="oar_billing_lastname"/>
             </div>
         </div>
         <div class="field company">
             <label class="label" for="oar-company"><span><?= $block->escapeHtml(__('Company Name')) ?></span></label>
             <div class="control">
-                <input type="text"  class="input-text" id="oar-company" name="oar_company"/>
+                <input type="text" required class="input-text" id="oar-company" name="oar_company"/>
             </div>
         </div>
     </fieldset>
