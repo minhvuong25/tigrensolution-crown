@@ -269,6 +269,7 @@ class Customer extends AbstractHelper
                     if(!empty( $post['oar_zip'])){
                         $this->searchCriteriaBuilder
                             ->addFilter('postcode', $post['oar_zip']) ;
+                        //a
                     }
                     if(!empty( $post['oar_phonenumber'])){
                         $this->searchCriteriaBuilder
