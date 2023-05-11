@@ -29,7 +29,6 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory;
-use Magento\Sales\Model\ResourceModel\Order\Status\History\CollectionFactory as HistoryCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Api\FilterBuilder;
@@ -146,7 +145,6 @@ class Customer extends AbstractHelper
      * @var OrderStatusHistoryRepositoryInterface
      */
     private $orderStatusHistoryRepositoryInterface;
-    protected $historyCollectionFactory;
 
     /**
      * @param Context $context
@@ -182,9 +180,7 @@ class Customer extends AbstractHelper
         OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepositoryInterface,
         OrderAddressRepositoryInterface $OrderAddressRepositoryInterface,
         OrderRepositoryInterface $orderRepository = null,
-        SearchCriteriaBuilder $searchCriteria = null,
-        FilterBuilder $filterBuilder,
-        HistoryCollectionFactory $historyCollectionFactory
+        SearchCriteriaBuilder $searchCriteria = null
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->storeManager = $storeManager;
@@ -193,13 +189,11 @@ class Customer extends AbstractHelper
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         $this->messageManager = $messageManager;
         $this->orderFactory = $orderFactory;
-        $this->historyCollectionFactory = $historyCollectionFactory;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderAddressRepositoryInterface = $OrderAddressRepositoryInterface;
         $this->orderStatusHistoryRepositoryInterface = $orderStatusHistoryRepositoryInterface;
         $this->_addressCollectionFactory = $addressCollectionFactory;
-        $this->filterBuilder = $filterBuilder;
         $this->orderRepository = $orderRepository ?: ObjectManager::getInstance()
             ->get(OrderRepositoryInterface::class);
         $this->searchCriteriaBuilder = $searchCriteria ?: ObjectManager::getInstance()
