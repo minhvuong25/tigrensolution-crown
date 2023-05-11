@@ -238,11 +238,13 @@ class Customer extends AbstractHelper
                 }
             } else {
                 if (!empty($post['oar_ordercomments']) || !empty($post['oar_email']) || !empty($post['oar_billing_lastname']) || !empty($post['oar_zip']) || !empty($post['oar_phonenumber']) || !empty($post['company'])) {
-                    $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
-                        $this->searchCriteriaBuilder
-                            ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%', 'like')
-                            ->create())->getItems();
-
+                    if (!empty($post['oar_ordercomments'])) {
+                        $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
+                            $this->searchCriteriaBuilder
+                                ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%', 'like')
+                                ->create())->getItems();
+                    }
+                    //vuong9xx@gmail.com
                     if (!empty($post['oar_email'])) {
                         $this->searchCriteriaBuilder
                             ->addFilter('email', $post['oar_email']);
@@ -267,7 +269,6 @@ class Customer extends AbstractHelper
                     $orderSearchbyAddress = $this->orderAddressRepositoryInterface->getList(
                         $this->searchCriteriaBuilder
                             ->create())->getItems();
-
                     $CommentIds = [];
                     $ordersIds = [];
                     if (!empty($orderSearchByComment)) {
@@ -277,12 +278,16 @@ class Customer extends AbstractHelper
                     }
 
                     if (!empty($orderSearchbyAddress)) {
-                        foreach ($orderSearchbyAddress as $commentid) {
-                            $ordersIds[] = $commentid->getParentId();
+                        foreach ($orderSearchbyAddress as $orderIdSearchByOrderAddress) {
+                            $ordersIds[] = $orderIdSearchByOrderAddress->getParentId();
                         }
                     }
 
-                    $ordersId = array_intersect($CommentIds, $ordersIds);
+                    if (empty($CommentIds)) {
+                        $ordersId = $ordersIds;
+                    } else {
+                        $ordersId = array_intersect($CommentIds, $ordersIds);
+                    }
 
                     $ordersearch = $this->orderRepository
                         ->getList($this->searchCriteriaBuilder
@@ -304,21 +309,23 @@ class Customer extends AbstractHelper
                             $orders[] = $orderId;
                         }
 
-                        $this->customerSession->setListId( $orders);
-//                        $this->coreRegistry->register('current_order', $orders);
+                        $this->customerSession->setListId($orders);
+                        //                        $this->coreRegistry->register('current_order', $orders);
                     } else {
                         $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
                         return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                     }
 
-                }
+
+                }}
 
             }
+        catch
+            (InputException $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
+                return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+            }
 
-        } catch (InputException $e) {
-            $this->messageManager->addErrorMessage($e->getMessage());
-            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-        }
         return true;
     }
 
