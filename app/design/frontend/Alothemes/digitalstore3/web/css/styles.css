@@ -1831,7 +1831,7 @@ ul.magictabs{padding:0}
 .product-view .product-qty label,.product-view .product-qty label span,
 .block-bundle-summary .product-details .product-qty .label span{color: #ffaa13;font-size: 14px;font-weight: normal;margin: 0 8px 0 0;line-height: 42px;vertical-align: middle;}
 .product-view .product-qty label span,.block-bundle-summary .product-details .product-qty .label span{margin: 0;}
-.block-bundle-summary .product-details .product-qty .label,{float: left;}
+.block-bundle-summary .product-details .product-qty .label{float: left;}
 .product-view .product-qty .custom-qty,.block-bundle-summary .product-details .product-qty .custom-qty,.product-view .product-qty .custom-qty .btn-plus{display: inline-block;vertical-align: middle;}
 .product-view .product-qty .custom-qty{padding: 5px 0;}
 .product-view .add-to-cart button.button {margin: 0;height: 46px;line-height: 46px;padding: 0 22px;}

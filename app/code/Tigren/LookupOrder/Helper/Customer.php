@@ -223,10 +223,9 @@ class Customer extends AbstractHelper
     {
         $post = $request->getPostValue();
         $fromCookie = $this->cookieManager->getCookie(self::COOKIE_NAME);
-        if (empty($post) && !$fromCookie) {
-            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-        }
-
+        //        if (empty($post) && !$fromCookie) {
+        //            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+        //        }
         try {
             if (!empty($post['oar_order_id'])) {
                 $orders = $this->orderRepository->getList(
@@ -244,158 +243,155 @@ class Customer extends AbstractHelper
                     return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
             } else {
-
-
-                if ((!empty($post['oar_zip'])) ||
-                    (!empty($post['oar_billing_lastname'])) ||
-                    (!empty($post['oar_company'])) ||
-                    (!empty($post['oar_email'])) ||
-                    (!empty($post['oar_ordercomments'])) ||
-                    (!empty($post['oar_phonenumber']))) {
-
+                if (!empty($post['oar_ordercomments']) || !empty($post['oar_email']) || !empty($post['oar_billing_lastname']) || !empty($post['oar_zip']) || !empty($post['oar_phonenumber']) || !empty($post['company'])) {
                     $orderSearchByComment = $this->orderStatusHistoryRepositoryInterface->getList(
                         $this->searchCriteriaBuilder
-                            ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%','like')
+                            ->addFilter('comment', '%' . $post['oar_ordercomments'] . '%', 'like')
                             ->create())->getItems();
 
-                    if(!empty( $post['oar_email'])){
+                    if (!empty($post['oar_email'])) {
                         $this->searchCriteriaBuilder
-                            ->addFilter('email', $post['oar_email']) ;
+                            ->addFilter('email', $post['oar_email']);
                     }
-                    if(!empty( $post['oar_billing_lastname'])){
+                    if (!empty($post['oar_billing_lastname'])) {
                         $this->searchCriteriaBuilder
-                            ->addFilter('lastname', $post['oar_billing_lastname']) ;
+                            ->addFilter('lastname', $post['oar_billing_lastname']);
                     }
-                    if(!empty( $post['oar_zip'])){
+                    if (!empty($post['oar_zip'])) {
                         $this->searchCriteriaBuilder
-                            ->addFilter('postcode', $post['oar_zip']) ;
-                        //a
+                            ->addFilter('postcode', $post['oar_zip']);
                     }
-                    if(!empty( $post['oar_phonenumber'])){
+                    if (!empty($post['oar_phonenumber'])) {
                         $this->searchCriteriaBuilder
-                            ->addFilter('telephone', $post['oar_phonenumber']) ;
-                    } if(!empty( $post['company'])){
-                        $this->searchCriteriaBuilder
-                            ->addFilter('company', '%' . $post['company'] . '%','like') ;
+                            ->addFilter('telephone', $post['oar_phonenumber']);
                     }
-
+                    if (!empty($post['company'])) {
+                        $this->searchCriteriaBuilder
+                            ->addFilter('company', '%' . $post['company'] . '%', 'like');
+                    }
 
                     $orderSearchbyAddress = $this->orderAddressRepositoryInterface->getList(
                         $this->searchCriteriaBuilder
                             ->create())->getItems();
+
                     $CommentIds = [];
-                    $orderSIds = [];
-                    foreach ($orderSearchByComment as $commentid){
-                        $CommentIds[] = $commentid->getParentId();
-                    }
-                    if(!empty($orderSearchbyAddress))
-                    {
-                        foreach ($orderSearchbyAddress as $commentid){
-                            $orderSIds[] = $commentid->getParentId();
+                    $ordersIds = [];
+                    if (!empty($orderSearchByComment)) {
+                        foreach ($orderSearchByComment as $commentid) {
+                            $CommentIds[] = $commentid->getParentId();
                         }
                     }
 
+                    if (!empty($orderSearchbyAddress)) {
+                        foreach ($orderSearchbyAddress as $commentid) {
+                            $ordersIds[] = $commentid->getParentId();
+                        }
+                    }
 
-
-                     $ordersId = array_intersect($CommentIds,$orderSIds);
+                    $ordersId = array_intersect($CommentIds, $ordersIds);
 
                     $ordersearch = $this->orderRepository
                         ->getList($this->searchCriteriaBuilder
-                            ->addFilter('entity_id',$ordersId)
+                            ->addFilter('entity_id', $ordersId, 'in')
                             ->create());
 
+                    if (!empty($ordersearch->getItems())) {
+                        $items = $ordersearch->getItems();
 
-                if (!empty($ordersearch->getItems())) {
-                    $items = $ordersearch->getItems();
-                    $orderIds = [];
+                        $orderIds = [];
 
-                    foreach ($items as $item) {
-                        $orderIds[] = $item->getEntityId();
+                        foreach ($items as $item) {
+                            $orderIds[] = $item->getEntityId();
 
+                        }
+                        $orders = [];
+                        foreach (array_unique($orderIds) as $orderId) {
+                            //                                $orders[] = $this->orderRepository->get($orderId);
+                            $orders[] = $orderId;
+                        }
+
+                        $this->customerSession->setListId( $orders);
+//                        $this->coreRegistry->register('current_order', $orders);
+                    } else {
+                        $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
+                        return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                     }
 
-                    $orders = [];
-                    foreach (array_unique($orderIds) as $orderId) {
-                        $orders[] = $this->orderRepository->get($orderId);
-                    }
-                    $this->coreRegistry->register('current_order', $orders);
-                    return true;
-                } else {
-                    $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
-                    return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
                 }
+
             }
-      else {
-                $this->messageManager->addErrorMessage('You entered incorrect data. Please try again.');
-                return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-            }
+
+        } catch (InputException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
         }
-        } catch (InputException $e)
-{
-$this->messageManager->addErrorMessage($e->getMessage());
-return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-}
-}
-
-/**
- * Get Breadcrumbs for current controller action
- *
- * @param Page $resultPage
- * @return void
- */
-public
-function getBreadcrumbs(Page $resultPage)
-{
-    $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
-    if (!$breadcrumbs) {
-        return;
+        return true;
     }
-    $breadcrumbs->addCrumb(
-        'home',
-        [
-            'label' => __('Home'),
-            'title' => __('Go to Home Page'),
-            'link' => $this->storeManager->getStore()->getBaseUrl()
-        ]
-    );
-    $breadcrumbs->addCrumb(
-        'cms_page',
-        ['label' => __('Order Information'), 'title' => __('Order Information')]
-    );
-}
 
-/**
- * @param $path
- * @param int $storeId
- * @return mixed
- */
-public
-function getGeneralConfig($path, $storeId = null)
-{
-    return $this->scopeConfig->getValue(
+    /**
+     * Get Breadcrumbs for current controller action
+     *
+     * @param Page $resultPage
+     * @return void
+     */
+    public
+    function getBreadcrumbs(
+        Page $resultPage
+    ) {
+        $breadcrumbs = $resultPage->getLayout()->getBlock('breadcrumbs');
+        if (!$breadcrumbs) {
+            return;
+        }
+        $breadcrumbs->addCrumb(
+            'home',
+            [
+                'label' => __('Home'),
+                'title' => __('Go to Home Page'),
+                'link' => $this->storeManager->getStore()->getBaseUrl()
+            ]
+        );
+        $breadcrumbs->addCrumb(
+            'cms_page',
+            ['label' => __('Order Information'), 'title' => __('Order Information')]
+        );
+    }
+
+    /**
+     * @param $path
+     * @param int $storeId
+     * @return mixed
+     */
+    public
+    function getGeneralConfig(
         $path,
-        ScopeInterface::SCOPE_STORE,
-        $storeId
-    );
-}
+        $storeId = null
+    ) {
+        return $this->scopeConfig->getValue(
+            $path,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
 
-/**
- * @param $path
- * @param int $storeId
- * @return mixed
- */
-public
-function getModuleConfig($path, $storeId = null)
-{
-    return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
-}
+    /**
+     * @param $path
+     * @param int $storeId
+     * @return mixed
+     */
+    public
+    function getModuleConfig(
+        $path,
+        $storeId = null
+    ) {
+        return $this->getGeneralConfig('tigren_lookup_order/' . $path, $storeId);
+    }
 
-/**
- *
- */
-public
-function getCustomerGroupId()
-{
-    return $this->customerSession->getCustomer()->getGroupId();
-}
+    /**
+     *
+     */
+    public
+    function getCustomerGroupId()
+    {
+        return $this->customerSession->getCustomer()->getGroupId();
+    }
 }

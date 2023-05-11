@@ -70,10 +70,10 @@ class View extends Action\Action implements HttpPostActionInterface, HttpGetActi
      */
     public function execute()
     {
-        if (!$this->formKeyValidator->validate($this->getRequest())) {
-            $this->messageManager->addErrorMessage('Invalid Form Key. Please refresh the page');
-            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
-        }
+//        if (!$this->formKeyValidator->validate($this->getRequest())) {
+//            $this->messageManager->addErrorMessage('Invalid Form Key. Please refresh the page');
+//            return $this->resultRedirectFactory->create()->setPath('lookuporder/customer/form');
+//        }
 
         $groupId=$this->_helper->getModuleConfig('lookup_order/customer_groups');
         $groupId=explode(',', $groupId);

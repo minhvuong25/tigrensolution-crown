@@ -1,8 +1,10 @@
 <?php
-$orders = $this->getCurrentOrder();
+//$orders = $this->getCurrentOrder();
+$orders=$block->getCustomData();
 ?>
 <?php foreach ($orders as $order): ?>
 <?php
+    $custom_data = $block->getCustomData();
 $items = $order->getAllVisibleItems();
 ?>
 <div id="maincontent" class="page-main-pal container" style="border: 2px solid #ccc; padding: 5px 20px; margin: 15px">
@@ -18,6 +20,56 @@ $items = $order->getAllVisibleItems();
         <div data-bind="scope: 'messages'">
         </div>
     </div>
+
+
+    <?php
+//      if (count($custom_data)) {
+//          ?>
+    <?php $gridrecords = $block->getCustomCollection(); ?>
+    <?php if ($gridrecords && sizeof($gridrecords)): ?>
+        <div class="table-wrapper orders-history">
+            <table class="data table table-order-items history" id="my-orders-table">
+                <caption class="table-caption"><?php echo __('Grid Record') ?></caption>
+                <thead>
+                <tr>
+                    <th scope="col" class="col id"><?php echo __('ID') ?></th>
+                    <th scope="col" class="col title"><?php echo __('Created At') ?></th>
+                    <th scope="col" class="col product"><?php echo __('Product Name') ?></th>
+                    <th scope="col" class="col amount"><?php echo __('Price') ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                foreach ($gridrecords as $gridrecord): ?>
+                    <tr>
+                        <td data-th="<?= $block->escapeHtml(__('ID')) ?>" class="col id">
+                            <?php echo $gridrecord->getId() ?>
+                        </td>
+                        <td data-th="<?= $block->escapeHtml(__('Created At')) ?>"
+                            class="col title"><?php echo date('Y-m-d', strtotime($gridrecord->getCreatedDate())); ?></td>
+                        <td data-th="<?= $block->escapeHtml(__('Product Name')) ?>" class="col product">
+                            <?php echo $gridrecord->getProductName() ?>
+                        </td>
+                        <td data-th="<?= $block->escapeHtml(__('Price')) ?>"
+                            class="col amount"><?php echo $block->getFormattedPrice($gridrecord->getPrice()) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+
+        <?php if ($block->getPagerHtml()): ?>
+
+        <?php endif ?>
+<!--    --><?php //else: ?>  -->
+    <?php endif ?>
+
+
+
+    <?php if ($block->getPagerHtml()): ?>
+
+    <?php endif ?>
     <div class="alocolumns clearfix">
         <div class="order-date">
             <?= $block->escapeHtml(__('<span class="label">Order Date:</span> %1', '<date>' . $block->formatDate($order->getCreatedAt(), \IntlDateFormatter::LONG) . '</date>'), ['span', 'date']) ?>
@@ -126,3 +178,11 @@ $items = $order->getAllVisibleItems();
     </div>
 </div>
 <?php endforeach; ?>
+
+  <?php
+  if ($block->getPagerHtml()): ?>
+                <div class="order-products-toolbar toolbar bottom">
+                    <?= $block->getPagerHtml() ?>
+                </div>
+        <?php endif ?>
+

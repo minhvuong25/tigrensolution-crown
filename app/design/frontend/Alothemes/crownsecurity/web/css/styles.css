@@ -437,7 +437,8 @@ p.required{font-size:11px;text-align:right;color:#EB340A}
 /* Sorter */
 .sorter-label,.limiter .label{font-size:14px;font-weight:bold;color:#333;float:left;padding:0 10px 0 15px;margin:0;line-height: 34px;text-transform: capitalize;font-weight: normal;}
 .sorter .limiter{margin:0;padding: 0 0 0 15px;}
-.pager {float: right; margin:0;display: none;}
+.pager {float: right; margin:0;
+}
 .limiter,.sorter{display: inline-block;vertical-align: middle;float: none;}
 .limiter .limiter-text{display: none;}
 .toolbar .limiter,.toolbar .sorter{padding-top: 0;}
